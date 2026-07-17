@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-07-17T08:32:28+00:00",
-  "updated_at_yangon": "2026-07-17T15:02:28+06:30",
+  "updated_at_utc": "2026-07-17T14:09:03+00:00",
+  "updated_at_yangon": "2026-07-17T20:39:03+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -10,26 +10,26 @@
     },
     "official_reference": {
       "USD_MMK": 2100.0,
-      "THB_MMK": 62.62,
-      "as_of": "2026-07-16T08:00:00+00:00",
+      "THB_MMK": 62.55,
+      "as_of": "2026-07-17T08:00:00+00:00",
       "source": "Central Bank of Myanmar (official fixed rate)"
     },
     "interbank": {
-      "USD_THB": 33.565,
-      "USD_EUR": 0.87207,
-      "as_of": "2026-07-16",
+      "USD_THB": 33.635,
+      "USD_EUR": 0.87451,
+      "as_of": "2026-07-17",
       "source": "Frankfurter / ECB reference"
     },
     "market_vs_official_spread_pct": 102.38
   },
   "gold": {
-    "usd_per_oz": 3993.0,
-    "usd_per_gram": 128.3779,
-    "as_of": "2026-07-17T08:31:48Z",
+    "usd_per_oz": 3999.800049,
+    "usd_per_gram": 128.5966,
+    "as_of": "2026-07-17T14:08:48Z",
     "source": "gold-api.com (international spot XAU/USD)",
-    "mmk_per_oz_market": 16970250.0,
-    "mmk_per_gram_market": 545606.21,
-    "mmk_per_tical_market": 8909367.44
+    "mmk_per_oz_market": 16999150.21,
+    "mmk_per_gram_market": 546535.37,
+    "mmk_per_tical_market": 8924540.02
   },
   "fuel": {
     "gasoline_95_usd_per_litre": 1.059,

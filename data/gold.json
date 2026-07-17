@@ -1,10 +1,10 @@
 {
-  "updated_at_utc": "2026-07-17T08:32:28+00:00",
-  "usd_per_oz": 3993.0,
-  "usd_per_gram": 128.3779,
-  "as_of": "2026-07-17T08:31:48Z",
+  "updated_at_utc": "2026-07-17T14:09:03+00:00",
+  "usd_per_oz": 3999.800049,
+  "usd_per_gram": 128.5966,
+  "as_of": "2026-07-17T14:08:48Z",
   "source": "gold-api.com (international spot XAU/USD)",
-  "mmk_per_oz_market": 16970250.0,
-  "mmk_per_gram_market": 545606.21,
-  "mmk_per_tical_market": 8909367.44
+  "mmk_per_oz_market": 16999150.21,
+  "mmk_per_gram_market": 546535.37,
+  "mmk_per_tical_market": 8924540.02
 }
