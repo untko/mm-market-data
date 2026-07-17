@@ -11,7 +11,7 @@ from . import common
 
 FUEL_PRICES_URL = "https://www.maxenergy.com.mm/fuel-prices-list/"
 FUEL_API_TIMEOUT = 90
-FUEL_API_ATTEMPTS = 5
+FUEL_HTTP_RETRIES = 5
 YANGON_TZ = timezone(timedelta(hours=6, minutes=30))
 
 # These stations are deliberately omitted by the Max Energy page's JavaScript.
@@ -22,6 +22,11 @@ _API_CONFIG_RE = re.compile(
     r".{0,800}?['\"]apikey['\"]\s*:\s*['\"](?P<key>[^'\"]+)['\"]",
     re.DOTALL,
 )
+_API_DATETIME_FORMATS = (
+    "%m/%d/%y %I:%M:%S %p",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%dT%H:%M:%S",
+)
 
 
 def _page_api_config(html: str) -> tuple[str, str]:
@@ -31,17 +36,41 @@ def _page_api_config(html: str) -> tuple[str, str]:
     return match.group("url"), match.group("key")
 
 
+def _request_with_retries(operation):
+    for attempt in range(FUEL_HTTP_RETRIES + 1):
+        try:
+            response = operation()
+            response.raise_for_status()
+            return response
+        except requests.RequestException:
+            if attempt == FUEL_HTTP_RETRIES:
+                raise
+
+
+def _row_timestamp(row: dict) -> datetime:
+    for field in ("transactiondate", "effectivedate", "pretransactiondate"):
+        value = row.get(field)
+        if not value:
+            continue
+        for date_format in _API_DATETIME_FORMATS:
+            try:
+                return datetime.strptime(value, date_format)
+            except ValueError:
+                continue
+    return datetime.min
+
+
 def _grade_prices(rows: list[dict], grade: str) -> list[float]:
     latest_by_station = {}
-    for row in rows:
+    for index, row in enumerate(rows):
         station_id = str(row.get("stationid"))
         if row.get("gradename") == grade and station_id not in EXCLUDED_STATION_IDS:
-            # The API orders intraday changes from oldest to newest, as assumed by
-            # the page's own JavaScript when it hides superseded duplicate rows.
-            latest_by_station[station_id] = row
+            candidate = (_row_timestamp(row), index, row)
+            if candidate[:2] >= latest_by_station.get(station_id, (datetime.min, -1))[:2]:
+                latest_by_station[station_id] = candidate
     return [
         float(row["price"])
-        for row in latest_by_station.values()
+        for _, _, row in latest_by_station.values()
         if float(row.get("price") or 0) > 0
     ]
 
@@ -68,8 +97,9 @@ def fetch(
     errors = []
     fuel = None
     try:
-        page = http.get(FUEL_PRICES_URL, headers=common.UA, timeout=common.TIMEOUT)
-        page.raise_for_status()
+        page = _request_with_retries(
+            lambda: http.get(FUEL_PRICES_URL, headers=common.UA, timeout=common.TIMEOUT)
+        )
         api_url, api_key = _page_api_config(page.text)
 
         query_time = now or datetime.now(YANGON_TZ)
@@ -81,19 +111,14 @@ def fetch(
             "fromdate": f"{query_date} 00:00:00",
             "todate": f"{query_date} 23:59:59",
         }
-        for attempt in range(1, FUEL_API_ATTEMPTS + 1):
-            try:
-                response = http.post(
-                    api_url,
-                    json=payload,
-                    headers={**common.UA, "Content-Type": "application/json"},
-                    timeout=FUEL_API_TIMEOUT,
-                )
-                response.raise_for_status()
-                break
-            except requests.RequestException:
-                if attempt == FUEL_API_ATTEMPTS:
-                    raise
+        response = _request_with_retries(
+            lambda: http.post(
+                api_url,
+                json=payload,
+                headers={**common.UA, "Content-Type": "application/json"},
+                timeout=FUEL_API_TIMEOUT,
+            )
+        )
         body = response.json()
         if body.get("messages") != "success":
             raise RuntimeError(f"Max Energy price API error: {body.get('messages', 'unknown')}")

@@ -35,20 +35,22 @@ class _MaxEnergyHttp:
         rows = []
         for grade, prices in {
             "95 Ron Octane": [
-                ("01", 1000),
-                ("01", 3300),
-                ("02", 3350),
-                ("03", 3400),
-                ("04", 0),
-                ("22", 9999),
+                ("01", 3300, "7/17/26 10:00:00 AM"),
+                ("01", 1000, "7/17/26 5:00:00 AM"),
+                ("02", 3350, "7/17/26 10:00:00 AM"),
+                ("02", 1000, "7/17/26 5:00:00 AM"),
+                ("03", 3400, "7/17/26 10:00:00 AM"),
+                ("04", 0, "7/17/26 10:00:00 AM"),
+                ("22", 9999, "7/17/26 10:00:00 AM"),
             ],
             "Diesel": [
-                ("01", 1000),
-                ("01", 3000),
-                ("02", 3100),
-                ("03", 3200),
-                ("04", 0),
-                ("24", 9999),
+                ("01", 3000, "7/17/26 10:00:00 AM"),
+                ("01", 1000, "7/17/26 5:00:00 AM"),
+                ("02", 3100, "7/17/26 10:00:00 AM"),
+                ("02", 1000, "7/17/26 5:00:00 AM"),
+                ("03", 3200, "7/17/26 10:00:00 AM"),
+                ("04", 0, "7/17/26 10:00:00 AM"),
+                ("24", 9999, "7/17/26 10:00:00 AM"),
             ],
         }.items():
             rows.extend(
@@ -57,8 +59,9 @@ class _MaxEnergyHttp:
                     "stationid": station_id,
                     "price": price,
                     "effectivedate": "7/17/26 12:00:00 AM",
+                    "transactiondate": transaction_date,
                 }
-                for station_id, price in prices
+                for station_id, price, transaction_date in prices
             )
         return _Response(payload={"messages": "success", "data": rows})
 
@@ -69,9 +72,20 @@ class _FlakyMaxEnergyHttp(_MaxEnergyHttp):
 
     def post(self, *args, **kwargs):
         self.attempts += 1
-        if self.attempts == 1:
+        if self.attempts <= 5:
             raise requests.Timeout("temporary timeout")
         return super().post(*args, **kwargs)
+
+
+class _FlakyPageHttp(_MaxEnergyHttp):
+    def __init__(self):
+        self.attempts = 0
+
+    def get(self, *args, **kwargs):
+        self.attempts += 1
+        if self.attempts <= 5:
+            raise requests.Timeout("temporary page timeout")
+        return super().get(*args, **kwargs)
 
 
 class FuelFetchTests(unittest.TestCase):
@@ -102,6 +116,16 @@ class FuelFetchTests(unittest.TestCase):
         result = fuel.fetch(
             4250,
             http=http,
+            now=datetime(2026, 7, 17, 2, 10, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual(result["errors"], [])
+        self.assertIsNotNone(result["data"])
+
+    def test_retries_a_temporary_page_timeout(self):
+        result = fuel.fetch(
+            4250,
+            http=_FlakyPageHttp(),
             now=datetime(2026, 7, 17, 2, 10, tzinfo=timezone.utc),
         )
 
