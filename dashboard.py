@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import csv
 import json
+from collections import Counter
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from html import escape
 from pathlib import Path
+
+import fuel_history
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
@@ -24,6 +28,27 @@ PANEL = "#ffffff"
 BACKGROUND = "#f6f8fc"
 BLUE = "#2563eb"
 ORANGE = "#e87817"
+
+
+@dataclass(frozen=True)
+class TrendSeries:
+    label: str
+    points: list[tuple[datetime, float]]
+    color: str
+    dash: str | None = None
+
+
+@dataclass(frozen=True)
+class DashboardModel:
+    latest: dict
+    updated: datetime
+    market: dict
+    fuel: dict
+    fx_updated: datetime
+    fuel_updated: datetime
+    fx_history: list[tuple[datetime, list[float]]]
+    fuel_history: list[tuple[datetime, list[float]]]
+    fuel_provenance: Counter[str]
 
 
 def _number(value, decimals: int = 0) -> str:
@@ -52,6 +77,47 @@ def _window(points, end: datetime, days: int = 30):
     return [point for point in points if start <= point[0] <= end]
 
 
+def _load_dashboard_model(data_dir: Path) -> DashboardModel:
+    latest = json.loads((data_dir / "latest.json").read_text(encoding="utf-8"))
+    updated = datetime.fromisoformat(latest["updated_at_utc"])
+
+    def snapshot_updated(filename: str) -> datetime:
+        path = data_dir / filename
+        if not path.exists():
+            return updated
+        try:
+            return datetime.fromisoformat(json.loads(path.read_text())["updated_at_utc"])
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+            return updated
+
+    fx_history = _window(
+        _read_history(data_dir / "history" / "exchange_rates.csv", ["usd_mmk_market"]),
+        updated,
+    )
+    fuel_window_start = updated - timedelta(days=30)
+    fuel_points = [
+        point
+        for point in fuel_history.read_max_energy_points(
+            data_dir / "history" / "fuel.csv", source_timezone=YANGON_TZ
+        )
+        if fuel_window_start <= point.source_timestamp <= updated
+    ]
+    return DashboardModel(
+        latest=latest,
+        updated=updated,
+        market=(latest.get("fx") or {}).get("market") or {},
+        fuel=latest.get("fuel") or {},
+        fx_updated=snapshot_updated("exchange_rates.json").astimezone(YANGON_TZ),
+        fuel_updated=snapshot_updated("fuel.json").astimezone(YANGON_TZ),
+        fx_history=fx_history,
+        fuel_history=[
+            (point.source_timestamp, [point.gasoline_95_mmk, point.diesel_mmk])
+            for point in fuel_points
+        ],
+        fuel_provenance=Counter(point.provenance for point in fuel_points),
+    )
+
+
 def _text(x, y, content, css_class="", anchor="start") -> str:
     return (
         f'<text x="{x}" y="{y}" class="{css_class}" '
@@ -71,7 +137,7 @@ def _card(x, width, title, value, note, accent) -> str:
     )
 
 
-def _trend_panel(x, width, title, subtitle, series) -> str:
+def _trend_panel(x, width, title, subtitle, series: list[TrendSeries]) -> str:
     y = 218
     height = 352
     parts = [
@@ -79,7 +145,7 @@ def _trend_panel(x, width, title, subtitle, series) -> str:
         _text(x + 18, y + 31, title, "panel-title"),
         _text(x + 18, y + 53, subtitle, "panel-subtitle"),
     ]
-    point_count = max((len(points) for _, points, _, _ in series), default=0)
+    point_count = max((len(item.points) for item in series), default=0)
     if point_count < MIN_TREND_POINTS:
         parts.extend(
             [
@@ -102,7 +168,7 @@ def _trend_panel(x, width, title, subtitle, series) -> str:
         )
         return "".join(parts)
 
-    all_points = [point for _, points, _, _ in series for point in points]
+    all_points = [point for item in series for point in item.points]
     timestamps = [point[0] for point in all_points]
     values = [point[1] for point in all_points]
     min_time, max_time = min(timestamps), max(timestamps)
@@ -118,11 +184,11 @@ def _trend_panel(x, width, title, subtitle, series) -> str:
     plot_width = width - 72
     plot_height = height - 132
 
-    def sx(timestamp):
+    def x_for_timestamp(timestamp):
         span = (max_time - min_time).total_seconds() or 1
         return plot_x + (timestamp - min_time).total_seconds() / span * plot_width
 
-    def sy(value):
+    def y_for_value(value):
         return plot_y + (high - value) / (high - low) * plot_height
 
     for ratio in (0, 0.5, 1):
@@ -144,69 +210,43 @@ def _trend_panel(x, width, title, subtitle, series) -> str:
         )
     )
 
-    for series_index, (label, points, color, dash) in enumerate(series):
-        coords = " ".join(f"{sx(ts):.1f},{sy(value):.1f}" for ts, value in points)
-        dash_attr = f' stroke-dasharray="{dash}"' if dash else ""
+    for series_index, item in enumerate(series):
+        coords = " ".join(
+            f"{x_for_timestamp(ts):.1f},{y_for_value(value):.1f}"
+            for ts, value in item.points
+        )
+        dash_attr = f' stroke-dasharray="{item.dash}"' if item.dash else ""
         parts.append(
-            f'<polyline points="{coords}" fill="none" stroke="{color}" stroke-width="2.5" '
+            f'<polyline points="{coords}" fill="none" stroke="{item.color}" stroke-width="2.5" '
             f'stroke-linecap="round" stroke-linejoin="round"{dash_attr}/>'
         )
-        last_ts, last_value = points[-1]
-        parts.append(f'<circle cx="{sx(last_ts):.1f}" cy="{sy(last_value):.1f}" r="4" fill="{color}"/>')
+        last_ts, last_value = item.points[-1]
+        parts.append(
+            f'<circle cx="{x_for_timestamp(last_ts):.1f}" '
+            f'cy="{y_for_value(last_value):.1f}" r="4" fill="{item.color}"/>'
+        )
         if len(series) > 1:
             legend_x = x + 18 + series_index * 126
             legend_y = y + 77
             parts.append(
                 f'<line x1="{legend_x}" y1="{legend_y}" x2="{legend_x + 22}" y2="{legend_y}" '
-                f'stroke="{color}" stroke-width="2.5"{dash_attr}/>'
+                f'stroke="{item.color}" stroke-width="2.5"{dash_attr}/>'
             )
-            parts.append(_text(legend_x + 29, legend_y + 4, label, "legend"))
+            parts.append(_text(legend_x + 29, legend_y + 4, item.label, "legend"))
     return "".join(parts)
 
 
 def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PATH) -> Path:
-    latest = json.loads((data_dir / "latest.json").read_text(encoding="utf-8"))
-    updated = datetime.fromisoformat(latest["updated_at_utc"])
-    fx = latest.get("fx") or {}
-    market = fx.get("market") or {}
-    fuel = latest.get("fuel") or {}
-
-    def snapshot_updated(filename: str) -> datetime:
-        path = data_dir / filename
-        if not path.exists():
-            return updated
-        try:
-            return datetime.fromisoformat(json.loads(path.read_text())["updated_at_utc"])
-        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
-            return updated
-
-    fx_updated = snapshot_updated("exchange_rates.json").astimezone(YANGON_TZ)
-    fuel_updated = snapshot_updated("fuel.json").astimezone(YANGON_TZ)
-
-    fx_history = _window(
-        _read_history(data_dir / "history" / "exchange_rates.csv", ["usd_mmk_market"]), updated
-    )
-    fuel_history = []
-    fuel_path = data_dir / "history" / "fuel.csv"
-    if fuel_path.exists():
-        with fuel_path.open(newline="", encoding="utf-8") as fh:
-            for row in csv.DictReader(fh):
-                try:
-                    # Max Energy observations use ISO source dates. This excludes
-                    # the older GlobalPetrolPrices row without conflating sources.
-                    datetime.fromisoformat(row["as_of"])
-                    source_date = datetime.fromisoformat(row["as_of"]).date()
-                    timestamp = datetime.combine(
-                        source_date, datetime.min.time(), tzinfo=YANGON_TZ
-                    )
-                    values = [
-                        float(row["gasoline_95_mmk_per_litre_market"]),
-                        float(row["diesel_mmk_per_litre_market"]),
-                    ]
-                except (KeyError, TypeError, ValueError):
-                    continue
-                fuel_history.append((timestamp, values))
-    fuel_history = _window(fuel_history, updated)
+    model = _load_dashboard_model(data_dir)
+    latest = model.latest
+    updated = model.updated
+    market = model.market
+    fuel = model.fuel
+    fx_updated = model.fx_updated
+    fuel_updated = model.fuel_updated
+    fx_history = model.fx_history
+    fuel_history_points = model.fuel_history
+    fuel_provenance = model.fuel_provenance
 
     updated_yangon = updated.astimezone(YANGON_TZ)
     status = "No source errors" if not latest.get("errors") else f"{len(latest['errors'])} source error(s)"
@@ -281,7 +321,13 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
             560,
             "Market USD / MMK",
             "Last 30 days · focused scale · MMK per USD",
-            [("USD / MMK", [(ts, values[0]) for ts, values in fx_history], BLUE, None)],
+            [
+                TrendSeries(
+                    "USD / MMK",
+                    [(ts, values[0]) for ts, values in fx_history],
+                    BLUE,
+                )
+            ],
         )
     )
     svg.append(
@@ -289,10 +335,22 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
             608,
             560,
             "Fuel / litre",
-            "Last 30 days · focused scale · station median MMK",
+            (
+                f"Last 30 days · {fuel_provenance['backfill']} backfill + "
+                f"{fuel_provenance['scheduled']} scheduled · station median MMK"
+            ),
             [
-                ("95 octane", [(ts, values[0]) for ts, values in fuel_history], ORANGE, None),
-                ("Diesel", [(ts, values[1]) for ts, values in fuel_history], BLUE, "6 4"),
+                TrendSeries(
+                    "95 octane",
+                    [(ts, values[0]) for ts, values in fuel_history_points],
+                    ORANGE,
+                ),
+                TrendSeries(
+                    "Diesel",
+                    [(ts, values[1]) for ts, values in fuel_history_points],
+                    BLUE,
+                    "6 4",
+                ),
             ],
         )
     )

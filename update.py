@@ -6,6 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
+import fuel_history
 from dashboard import generate_dashboard
 from scrapers import common, exchange_rates, fuel, gold
 
@@ -125,22 +126,12 @@ def run(topics: set[str]) -> int:
     if fuel_observation:
         common.append_csv(
             "history/fuel.csv",
-            {
-                "ts_utc": now,
-                "as_of": fuel_observation.get("as_of"),
-                "gasoline_95_usd_per_litre": fuel_observation.get(
-                    "gasoline_95_usd_per_litre"
-                ),
-                "diesel_usd_per_litre": fuel_observation.get("diesel_usd_per_litre"),
-                "gasoline_95_mmk_per_litre_market": fuel_observation.get(
-                    "gasoline_95_mmk_per_litre_market"
-                ),
-                "diesel_mmk_per_litre_market": fuel_observation.get(
-                    "diesel_mmk_per_litre_market"
-                ),
-                "source": fuel_observation.get("source"),
-                "provenance": "scheduled",
-            },
+            fuel_history.serialize(
+                fuel_observation,
+                ts_utc=now,
+                provenance=fuel_history.PROVENANCE_SCHEDULED,
+                include_usd=True,
+            ),
             dedupe_keys=["as_of", "gasoline_95_usd_per_litre", "diesel_usd_per_litre"],
         )
 

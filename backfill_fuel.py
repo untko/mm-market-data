@@ -5,34 +5,22 @@ from __future__ import annotations
 import argparse
 import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+import fuel_history
 from dashboard import generate_dashboard
 from scrapers import fuel
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_OUTPUT = ROOT / "data" / "history" / "fuel.csv"
-FIELDNAMES = [
-    "ts_utc",
-    "as_of",
-    "gasoline_95_usd_per_litre",
-    "diesel_usd_per_litre",
-    "gasoline_95_mmk_per_litre_market",
-    "diesel_mmk_per_litre_market",
-    "source",
-    "provenance",
-]
+def _retrieval_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _dates(end: date, days: int) -> list[date]:
     start = end - timedelta(days=days - 1)
     return [start + timedelta(days=offset) for offset in range(days)]
-
-
-def _source_timestamp(day: date) -> str:
-    local_midnight = datetime.combine(day, time.min, tzinfo=fuel.YANGON_TZ)
-    return local_midnight.astimezone(timezone.utc).isoformat()
 
 
 def _read_existing(path: Path) -> list[dict]:
@@ -43,11 +31,11 @@ def _read_existing(path: Path) -> list[dict]:
     for row in rows:
         if not row.get("source"):
             row["source"] = (
-                "Max Energy Myanmar daily station prices (median across stations)"
+                fuel_history.MAX_ENERGY_SOURCE
                 if row.get("as_of", "")[:4].isdigit()
                 else "GlobalPetrolPrices.com (legacy weekly national average)"
             )
-        row["provenance"] = row.get("provenance") or "scheduled"
+        row["provenance"] = row.get("provenance") or fuel_history.PROVENANCE_SCHEDULED
     return rows
 
 
@@ -55,9 +43,11 @@ def _write_rows(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
     with temporary.open("w", newline="", encoding="utf-8") as fh:
-        writer = csv.DictWriter(fh, fieldnames=FIELDNAMES)
+        writer = csv.DictWriter(fh, fieldnames=fuel_history.FIELDNAMES)
         writer.writeheader()
-        writer.writerows({field: row.get(field, "") for field in FIELDNAMES} for row in rows)
+        writer.writerows(
+            {field: row.get(field, "") for field in fuel_history.FIELDNAMES} for row in rows
+        )
     temporary.replace(path)
 
 
@@ -75,6 +65,7 @@ def backfill(days: int, end: date, workers: int, output: Path = DEFAULT_OUTPUT) 
     fetched_rows = []
     failures = []
     if requested:
+        retrieved_at_utc = _retrieval_timestamp()
         api_config = fuel.discover_api_config()
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = {
@@ -88,19 +79,26 @@ def backfill(days: int, end: date, workers: int, output: Path = DEFAULT_OUTPUT) 
                     failures.append((day, result["errors"]))
                     continue
                 data = result["data"]
+                if data.get("as_of") != day.isoformat():
+                    failures.append(
+                        (
+                            day,
+                            [
+                                "Max Energy returned source date "
+                                f"{data.get('as_of')!r} for requested date {day.isoformat()}"
+                            ],
+                        )
+                    )
+                    continue
+                # Retrieval time is intentionally distinct from the API's
+                # historical source date in `as_of`.
                 fetched_rows.append(
-                    {
-                        "ts_utc": _source_timestamp(day),
-                        "as_of": day.isoformat(),
-                        "gasoline_95_usd_per_litre": "",
-                        "diesel_usd_per_litre": "",
-                        "gasoline_95_mmk_per_litre_market": data[
-                            "gasoline_95_mmk_per_litre_market"
-                        ],
-                        "diesel_mmk_per_litre_market": data["diesel_mmk_per_litre_market"],
-                        "source": data["source"],
-                        "provenance": "backfill",
-                    }
+                    fuel_history.serialize(
+                        data,
+                        ts_utc=retrieved_at_utc,
+                        provenance=fuel_history.PROVENANCE_BACKFILL,
+                        include_usd=False,
+                    )
                 )
 
     by_source_date = {(row.get("source"), row.get("as_of")): row for row in fetched_rows}

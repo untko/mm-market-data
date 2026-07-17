@@ -107,7 +107,9 @@ python backfill_fuel.py --days 30
   collected market FX rate. Actual prices vary by station and day.
 - Historical fuel rows are labelled `backfill` or `scheduled` in the CSV. Backfilled MMK
   pump prices are genuine Max Energy observations; historical USD equivalents are left
-  blank because no matching historical market-FX series is available.
+  blank because no matching historical market-FX series is available. For backfilled
+  rows, `as_of` is the API's source date and `ts_utc` is the archive retrieval time, not a
+  historical observation timestamp.
 - Third-party endpoints can change or go down; failures are logged in `errors` and the
   previous committed data stays in place until a source recovers.
 

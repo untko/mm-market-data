@@ -7,12 +7,15 @@ from datetime import date, datetime, timedelta, timezone
 
 import requests
 
+from fuel_history import MAX_ENERGY_SOURCE
+
 from . import common
 
 FUEL_PRICES_URL = "https://www.maxenergy.com.mm/fuel-prices-list/"
 FUEL_API_TIMEOUT = 90
 FUEL_HTTP_RETRIES = 5
 YANGON_TZ = timezone(timedelta(hours=6, minutes=30))
+SOURCE = MAX_ENERGY_SOURCE
 
 # These stations are deliberately omitted by the Max Energy page's JavaScript.
 EXCLUDED_STATION_IDS = {"22", "24"}
@@ -142,7 +145,7 @@ def fetch_for_date(
                 "gasoline_95": len(gasoline_prices),
                 "diesel": len(diesel_prices),
             },
-            "source": "Max Energy Myanmar daily station prices (median across stations)",
+            "source": SOURCE,
         }
     except Exception as exc:  # noqa: BLE001 - never crash the workflow
         errors.append(f"fuel_max_energy: {exc}")
