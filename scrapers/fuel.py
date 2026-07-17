@@ -78,13 +78,9 @@ def _grade_prices(rows: list[dict], grade: str) -> list[float]:
 def _as_of(rows: list[dict]) -> str | None:
     dates = []
     for row in rows:
-        value = row.get("effectivedate") or row.get("pretransactiondate")
-        if not value:
-            continue
-        try:
-            dates.append(datetime.strptime(value, "%m/%d/%y %I:%M:%S %p").date())
-        except ValueError:
-            continue
+        timestamp = _row_timestamp(row)
+        if timestamp != datetime.min:
+            dates.append(timestamp.date())
     return max(dates).isoformat() if dates else None
 
 
