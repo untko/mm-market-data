@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 import statistics
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import requests
 
@@ -84,28 +84,29 @@ def _as_of(rows: list[dict]) -> str | None:
     return max(dates).isoformat() if dates else None
 
 
-def fetch(
+def discover_api_config(*, http=requests) -> tuple[str, str]:
+    page = _request_with_retries(
+        lambda: http.get(FUEL_PRICES_URL, headers=common.UA, timeout=common.TIMEOUT)
+    )
+    return _page_api_config(page.text)
+
+
+def fetch_for_date(
+    query_date: date,
     usd_mmk_market: float | None = None,
     *,
     http=requests,
-    now: datetime | None = None,
+    api_config: tuple[str, str] | None = None,
 ) -> dict:
     errors = []
     fuel = None
     try:
-        page = _request_with_retries(
-            lambda: http.get(FUEL_PRICES_URL, headers=common.UA, timeout=common.TIMEOUT)
-        )
-        api_url, api_key = _page_api_config(page.text)
-
-        query_time = now or datetime.now(YANGON_TZ)
-        if query_time.tzinfo is not None:
-            query_time = query_time.astimezone(YANGON_TZ)
-        query_date = query_time.strftime("%Y-%m-%d")
+        api_url, api_key = api_config or discover_api_config(http=http)
+        query_date_text = query_date.isoformat()
         payload = {
             "apikey": api_key,
-            "fromdate": f"{query_date} 00:00:00",
-            "todate": f"{query_date} 23:59:59",
+            "fromdate": f"{query_date_text} 00:00:00",
+            "todate": f"{query_date_text} 23:59:59",
         }
         response = _request_with_retries(
             lambda: http.post(
@@ -146,3 +147,15 @@ def fetch(
     except Exception as exc:  # noqa: BLE001 - never crash the workflow
         errors.append(f"fuel_max_energy: {exc}")
     return {"data": fuel, "errors": errors}
+
+
+def fetch(
+    usd_mmk_market: float | None = None,
+    *,
+    http=requests,
+    now: datetime | None = None,
+) -> dict:
+    query_time = now or datetime.now(YANGON_TZ)
+    if query_time.tzinfo is not None:
+        query_time = query_time.astimezone(YANGON_TZ)
+    return fetch_for_date(query_time.date(), usd_mmk_market, http=http)

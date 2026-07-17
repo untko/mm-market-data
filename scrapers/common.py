@@ -44,6 +44,14 @@ def write_json(relpath: str, obj) -> None:
     os.replace(tmp, path)
 
 
+def read_json(relpath: str):
+    path = os.path.join(DATA_DIR, relpath)
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
 def append_csv(relpath: str, row: dict, dedupe_keys) -> bool:
     """Append a row; skip if the last row matches on dedupe_keys. Returns True if appended."""
     path = os.path.join(DATA_DIR, relpath)

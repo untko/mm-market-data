@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 import unittest
 
 import requests
@@ -89,6 +89,21 @@ class _FlakyPageHttp(_MaxEnergyHttp):
 
 
 class FuelFetchTests(unittest.TestCase):
+    def test_fetches_a_specific_historical_day_with_reused_api_config(self):
+        result = fuel.fetch_for_date(
+            date(2026, 7, 17),
+            4250,
+            http=_MaxEnergyHttp(),
+            api_config=(
+                "https://app.maxenergy.com.mm/maxapi/webapi/Price/GetPriceList",
+                "public-page-key",
+            ),
+        )
+
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["data"]["as_of"], "2026-07-17")
+        self.assertEqual(result["data"]["stations_sampled"], {"gasoline_95": 3, "diesel": 3})
+
     def test_returns_median_max_energy_station_prices(self):
         result = fuel.fetch(
             4250,
