@@ -1,91 +1,127 @@
-"""Fuel: Myanmar pump prices (gasoline 95 & diesel, USD/litre) scraped from
-GlobalPetrolPrices.com country chart. The chart is JS-rendered, so this uses
-headless Chromium via Playwright. GPP updates weekly (Mondays)."""
+"""Myanmar pump prices from Max Energy's daily station-price page."""
 from __future__ import annotations
 
 import re
-import shutil
+import statistics
+from datetime import datetime, timedelta, timezone
 
-GASOLINE_URL = "https://www.globalpetrolprices.com/gasoline_prices/"
-DIESEL_URL = "https://www.globalpetrolprices.com/diesel_prices/"
-COUNTRY = "Burma"  # label used by GlobalPetrolPrices
+import requests
 
-_EXTRACT_JS = """(country) => {
-    const clean = s => (s || '').replace(/\\s+/g, ' ').trim();
-    const valRe = /^\\d+\\.\\d{2,3}$/;
-    const names = [...document.querySelectorAll('.outsideTitleElement, .outsideTitle')]
-        .map(e => clean(e.textContent)).filter(t => t);
-    const vals = [...document.querySelectorAll('body *')]
-        .filter(e => e.children.length === 0 && e.offsetParent !== null && valRe.test(clean(e.textContent)))
-        .map(e => parseFloat(clean(e.textContent)));
-    let v = vals.slice();
-    if (v.length === names.length + 1) {
-        // one extra value (world average) — find the removal that restores the
-        // chart's ascending order
-        for (let i = 0; i < v.length; i++) {
-            const t = v.slice(0, i).concat(v.slice(i + 1));
-            let mono = true;
-            for (let j = 1; j < t.length; j++) if (t[j] < t[j - 1]) { mono = false; break; }
-            if (mono) { v = t; break; }
-        }
-    }
-    if (v.length !== names.length) return { error: `misaligned: ${names.length} names vs ${v.length} values` };
-    const idx = names.findIndex(t => t === country || t === country + '*');
-    if (idx < 0) return { error: 'country not found in chart' };
-    const m = document.title.match(/(\\d{2}-\\w{3}-\\d{4})/);
-    return { price: v[idx], as_of: m ? m[1] : null };
-}"""
+from . import common
 
-_WAIT_JS = """() => document.querySelectorAll('.outsideTitleElement, .outsideTitle').length > 100"""
+FUEL_PRICES_URL = "https://www.maxenergy.com.mm/fuel-prices-list/"
+FUEL_API_TIMEOUT = 90
+FUEL_API_ATTEMPTS = 5
+YANGON_TZ = timezone(timedelta(hours=6, minutes=30))
+
+# These stations are deliberately omitted by the Max Energy page's JavaScript.
+EXCLUDED_STATION_IDS = {"22", "24"}
+
+_API_CONFIG_RE = re.compile(
+    r"url:\s*['\"](?P<url>https://app\.maxenergy\.com\.mm/[^'\"]*/Price/GetPriceList/?)['\"]"
+    r".{0,800}?['\"]apikey['\"]\s*:\s*['\"](?P<key>[^'\"]+)['\"]",
+    re.DOTALL,
+)
 
 
-def _launch_browser(p):
-    args = ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
-    exe = shutil.which("chromium") or shutil.which("chromium-browser")
-    kwargs = {"args": args, "headless": True}
-    if exe:  # local dev: use system chromium; CI uses playwright's own build
-        kwargs["executable_path"] = exe
-    return p.chromium.launch(**kwargs)
+def _page_api_config(html: str) -> tuple[str, str]:
+    match = _API_CONFIG_RE.search(html)
+    if not match:
+        raise RuntimeError("Max Energy price API configuration not found in page")
+    return match.group("url"), match.group("key")
 
 
-def _scrape_one(p, url: str) -> dict:
-    browser = _launch_browser(p)
-    try:
-        page = browser.new_page(user_agent=common_ua())
-        page.goto(url, wait_until="domcontentloaded", timeout=60000)
-        page.wait_for_function(_WAIT_JS, timeout=45000)
-        result = page.evaluate(_EXTRACT_JS, COUNTRY)
-        if "error" in result:
-            raise RuntimeError(result["error"])
-        return result
-    finally:
-        browser.close()
+def _grade_prices(rows: list[dict], grade: str) -> list[float]:
+    latest_by_station = {}
+    for row in rows:
+        station_id = str(row.get("stationid"))
+        if row.get("gradename") == grade and station_id not in EXCLUDED_STATION_IDS:
+            # The API orders intraday changes from oldest to newest, as assumed by
+            # the page's own JavaScript when it hides superseded duplicate rows.
+            latest_by_station[station_id] = row
+    return [
+        float(row["price"])
+        for row in latest_by_station.values()
+        if float(row.get("price") or 0) > 0
+    ]
 
 
-def common_ua() -> str:
-    from . import common
+def _as_of(rows: list[dict]) -> str | None:
+    dates = []
+    for row in rows:
+        value = row.get("effectivedate") or row.get("pretransactiondate")
+        if not value:
+            continue
+        try:
+            dates.append(datetime.strptime(value, "%m/%d/%y %I:%M:%S %p").date())
+        except ValueError:
+            continue
+    return max(dates).isoformat() if dates else None
 
-    return common.UA["User-Agent"]
 
-
-def fetch(usd_mmk_market: float | None = None) -> dict:
+def fetch(
+    usd_mmk_market: float | None = None,
+    *,
+    http=requests,
+    now: datetime | None = None,
+) -> dict:
     errors = []
     fuel = None
     try:
-        from playwright.sync_api import sync_playwright
+        page = http.get(FUEL_PRICES_URL, headers=common.UA, timeout=common.TIMEOUT)
+        page.raise_for_status()
+        api_url, api_key = _page_api_config(page.text)
 
-        with sync_playwright() as p:
-            gasoline = _scrape_one(p, GASOLINE_URL)
-            diesel = _scrape_one(p, DIESEL_URL)
-        fuel = {
-            "gasoline_95_usd_per_litre": gasoline["price"],
-            "diesel_usd_per_litre": diesel["price"],
-            "as_of": gasoline["as_of"] or diesel["as_of"],
-            "source": "GlobalPetrolPrices.com (weekly, octane-95 gasoline & diesel)",
+        query_time = now or datetime.now(YANGON_TZ)
+        if query_time.tzinfo is not None:
+            query_time = query_time.astimezone(YANGON_TZ)
+        query_date = query_time.strftime("%Y-%m-%d")
+        payload = {
+            "apikey": api_key,
+            "fromdate": f"{query_date} 00:00:00",
+            "todate": f"{query_date} 23:59:59",
         }
-        if usd_mmk_market:
-            fuel["gasoline_95_mmk_per_litre_market"] = round(gasoline["price"] * usd_mmk_market, 2)
-            fuel["diesel_mmk_per_litre_market"] = round(diesel["price"] * usd_mmk_market, 2)
-    except Exception as exc:  # noqa: BLE001
-        errors.append(f"fuel_gpp: {exc}")
+        for attempt in range(1, FUEL_API_ATTEMPTS + 1):
+            try:
+                response = http.post(
+                    api_url,
+                    json=payload,
+                    headers={**common.UA, "Content-Type": "application/json"},
+                    timeout=FUEL_API_TIMEOUT,
+                )
+                response.raise_for_status()
+                break
+            except requests.RequestException:
+                if attempt == FUEL_API_ATTEMPTS:
+                    raise
+        body = response.json()
+        if body.get("messages") != "success":
+            raise RuntimeError(f"Max Energy price API error: {body.get('messages', 'unknown')}")
+
+        rows = body.get("data") or []
+        gasoline_prices = _grade_prices(rows, "95 Ron Octane")
+        diesel_prices = _grade_prices(rows, "Diesel")
+        if not gasoline_prices or not diesel_prices:
+            raise RuntimeError("Max Energy returned no usable 95-octane or diesel prices")
+
+        gasoline_mmk = float(statistics.median(gasoline_prices))
+        diesel_mmk = float(statistics.median(diesel_prices))
+        fuel = {
+            "gasoline_95_usd_per_litre": (
+                round(gasoline_mmk / usd_mmk_market, 4) if usd_mmk_market else None
+            ),
+            "diesel_usd_per_litre": (
+                round(diesel_mmk / usd_mmk_market, 4) if usd_mmk_market else None
+            ),
+            "gasoline_95_mmk_per_litre_market": gasoline_mmk,
+            "diesel_mmk_per_litre_market": diesel_mmk,
+            "as_of": _as_of(rows),
+            "stations_sampled": {
+                "gasoline_95": len(gasoline_prices),
+                "diesel": len(diesel_prices),
+            },
+            "source": "Max Energy Myanmar daily station prices (median across stations)",
+        }
+    except Exception as exc:  # noqa: BLE001 - never crash the workflow
+        errors.append(f"fuel_max_energy: {exc}")
     return {"data": fuel, "errors": errors}

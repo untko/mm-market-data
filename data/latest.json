@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-07-16T19:43:41+00:00",
-  "updated_at_yangon": "2026-07-17T02:13:41+06:30",
+  "updated_at_utc": "2026-07-17T04:49:16+00:00",
+  "updated_at_yangon": "2026-07-17T11:19:16+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -23,21 +23,25 @@
     "market_vs_official_spread_pct": 102.38
   },
   "gold": {
-    "usd_per_oz": 3977.5,
-    "usd_per_gram": 127.8796,
-    "as_of": "2026-07-16T19:43:10Z",
+    "usd_per_oz": 3984.199951,
+    "usd_per_gram": 128.095,
+    "as_of": "2026-07-17T04:48:18Z",
     "source": "gold-api.com (international spot XAU/USD)",
-    "mmk_per_oz_market": 16904375.0,
-    "mmk_per_gram_market": 543488.28,
-    "mmk_per_tical_market": 8874783.11
+    "mmk_per_oz_market": 16932849.79,
+    "mmk_per_gram_market": 544403.76,
+    "mmk_per_tical_market": 8889732.36
   },
   "fuel": {
-    "gasoline_95_usd_per_litre": 1.059,
-    "diesel_usd_per_litre": 1,
-    "as_of": "13-Jul-2026",
-    "source": "GlobalPetrolPrices.com (weekly, octane-95 gasoline & diesel)",
-    "gasoline_95_mmk_per_litre_market": 4500.75,
-    "diesel_mmk_per_litre_market": 4250.0
+    "gasoline_95_usd_per_litre": 0.7835,
+    "diesel_usd_per_litre": 0.7576,
+    "gasoline_95_mmk_per_litre_market": 3330.0,
+    "diesel_mmk_per_litre_market": 3220.0,
+    "as_of": "2026-07-17",
+    "stations_sampled": {
+      "gasoline_95": 79,
+      "diesel": 79
+    },
+    "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
   "errors": []
 }
