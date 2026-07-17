@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-07-17T03:45:05+00:00",
-  "updated_at_yangon": "2026-07-17T10:15:05+06:30",
+  "updated_at_utc": "2026-07-17T08:32:28+00:00",
+  "updated_at_yangon": "2026-07-17T15:02:28+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -22,7 +22,15 @@
     },
     "market_vs_official_spread_pct": 102.38
   },
-  "gold": null,
+  "gold": {
+    "usd_per_oz": 3993.0,
+    "usd_per_gram": 128.3779,
+    "as_of": "2026-07-17T08:31:48Z",
+    "source": "gold-api.com (international spot XAU/USD)",
+    "mmk_per_oz_market": 16970250.0,
+    "mmk_per_gram_market": 545606.21,
+    "mmk_per_tical_market": 8909367.44
+  },
   "fuel": {
     "gasoline_95_usd_per_litre": 1.059,
     "diesel_usd_per_litre": 1,
@@ -31,7 +39,5 @@
     "gasoline_95_mmk_per_litre_market": 4500.75,
     "diesel_mmk_per_litre_market": 4250.0
   },
-  "errors": [
-    "gold_api: HTTPSConnectionPool(host='api.gold-api.com', port=443): Max retries exceeded with url: /price/XAU (Caused by NameResolutionError(\"HTTPSConnection(host='api.gold-api.com', port=443): Failed to resolve 'api.gold-api.com' ([Errno -2] Name or service not known)\"))"
-  ]
+  "errors": []
 }
