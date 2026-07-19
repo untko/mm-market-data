@@ -13,6 +13,9 @@ import requests
 from . import common
 
 SUPERRICH_P2P_URL = "https://superrich.tech/api/p2p-rates"
+SUPERRICH_THAILAND_RATES_URL = "https://www.superrichthailand.com/api/v1/rates"
+SUPERRICH_THAILAND_CURRENCIES = ("USD", "GBP", "EUR", "JPY", "CNY")
+SUPERRICH_THAILAND_AUTHORIZATION = "Basic c3VwZXJyaWNoVGg6aFRoY2lycmVwdXM="
 BINANCE_P2P_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
 CBM_URL = "https://forex.cbm.gov.mm/api/latest"
 FRANKFURTER_URL = "https://api.frankfurter.dev/v1/latest"
@@ -58,6 +61,60 @@ def _market_from_binance() -> dict:
     }
 
 
+def _retail_cash_superrich_thailand() -> dict:
+    """Primary cash-counter quotes advertised by SuperRich Thailand.
+
+    The first rate is the site's primary quote for a currency and normally
+    represents its largest banknote denomination. Buying and selling are from
+    SuperRich's perspective; values are Thai baht per unit of foreign currency.
+    """
+    body = common.get_json(
+        SUPERRICH_THAILAND_RATES_URL,
+        headers={"Authorization": SUPERRICH_THAILAND_AUTHORIZATION},
+    )
+    if body.get("code") != 20000:
+        raise RuntimeError(
+            f"SuperRich Thailand API error: {body.get('descriptionEn', 'unknown')}"
+        )
+
+    data = body.get("data") or {}
+    rates_by_currency = {
+        item.get("cUnit"): item for item in data.get("exchangeRate") or []
+    }
+    missing = [
+        currency for currency in SUPERRICH_THAILAND_CURRENCIES if currency not in rates_by_currency
+    ]
+    if missing:
+        raise RuntimeError(f"SuperRich Thailand missing currencies: {', '.join(missing)}")
+
+    quotes = {}
+    for currency in SUPERRICH_THAILAND_CURRENCIES:
+        rate_options = rates_by_currency[currency].get("rate") or []
+        if not rate_options:
+            raise RuntimeError(f"SuperRich Thailand returned no {currency} rates")
+        primary = rate_options[0]
+        buying = float(primary["cBuying"])
+        selling = float(primary["cSelling"])
+        if buying <= 0 or selling <= 0:
+            raise RuntimeError(f"SuperRich Thailand returned invalid {currency} rates")
+        quotes[currency] = {
+            "pair": f"{currency}/THB",
+            "denomination": str(primary.get("denom") or "").strip() or None,
+            "buy_thb_per_unit": buying,
+            "sell_thb_per_unit": selling,
+            "midpoint_thb_per_unit": round((buying + selling) / 2, 6),
+        }
+
+    return {
+        "quote_currency": "THB",
+        "quotes": quotes,
+        # The API currently suffixes a Thailand wall-clock value with "Z".
+        # Preserve it verbatim instead of presenting it as a trustworthy UTC instant.
+        "source_updated_at_raw": data.get("dateTime"),
+        "source": "SuperRich Thailand retail cash exchange",
+    }
+
+
 def _official_cbm() -> dict:
     body = common.get_json(CBM_URL)
     as_of = None
@@ -100,13 +157,24 @@ def fetch() -> dict:
     except Exception as exc:  # noqa: BLE001
         errors.append(f"official_cbm: {exc}")
 
+    retail_cash = None
+    try:
+        retail_cash = _retail_cash_superrich_thailand()
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"retail_cash_superrich_thailand: {exc}")
+
     interbank = None
     try:
         interbank = _interbank()
     except Exception as exc:  # noqa: BLE001
         errors.append(f"interbank: {exc}")
 
-    result = {"market": market, "official_reference": official, "interbank": interbank}
+    result = {
+        "market": market,
+        "official_reference": official,
+        "interbank": interbank,
+        "retail_cash": retail_cash,
+    }
     if market and official and official.get("USD_MMK"):
         result["market_vs_official_spread_pct"] = round(
             (market["USD_MMK"] / official["USD_MMK"] - 1) * 100, 2

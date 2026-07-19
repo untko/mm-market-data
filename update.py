@@ -26,7 +26,7 @@ def _snapshot(relpath: str) -> dict | None:
 
 def _merged_fx(existing: dict | None, fetched: dict) -> dict:
     merged = dict(existing or {})
-    for key in ("market", "official_reference", "interbank"):
+    for key in ("market", "official_reference", "interbank", "retail_cash"):
         if fetched.get(key) is not None:
             merged[key] = fetched[key]
     market = merged.get("market") or {}
@@ -36,6 +36,22 @@ def _merged_fx(existing: dict | None, fetched: dict) -> dict:
             (market["USD_MMK"] / official["USD_MMK"] - 1) * 100, 2
         )
     return merged
+
+
+def _retail_cash_history_row(retail_cash: dict, *, ts_utc: str) -> dict:
+    row = {
+        "ts_utc": ts_utc,
+        "source_updated_at_raw": retail_cash.get("source_updated_at_raw"),
+    }
+    quotes = retail_cash.get("quotes") or {}
+    for currency in exchange_rates.SUPERRICH_THAILAND_CURRENCIES:
+        quote = quotes.get(currency) or {}
+        prefix = currency.lower()
+        row[f"{prefix}_denomination"] = quote.get("denomination")
+        row[f"{prefix}_buy_thb_per_unit"] = quote.get("buy_thb_per_unit")
+        row[f"{prefix}_sell_thb_per_unit"] = quote.get("sell_thb_per_unit")
+    row["source"] = retail_cash.get("source")
+    return row
 
 
 def run(topics: set[str]) -> int:
@@ -111,6 +127,19 @@ def run(topics: set[str]) -> int:
                 "source": observed_market.get("source"),
             },
             dedupe_keys=["usd_mmk_market", "thb_mmk_market", "usd_mmk_official"],
+        )
+    if fx_observation and fx_observation.get("retail_cash"):
+        retail_cash = fx_observation["retail_cash"]
+        retail_row = _retail_cash_history_row(retail_cash, ts_utc=now)
+        retail_dedupe_keys = [
+            f"{currency.lower()}_{field}"
+            for currency in exchange_rates.SUPERRICH_THAILAND_CURRENCIES
+            for field in ("denomination", "buy_thb_per_unit", "sell_thb_per_unit")
+        ]
+        common.append_csv(
+            "history/superrich_thailand.csv",
+            retail_row,
+            dedupe_keys=retail_dedupe_keys,
         )
     if gold_observation:
         common.append_csv(

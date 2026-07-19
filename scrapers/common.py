@@ -20,7 +20,8 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 
 
 def get_json(url: str, **kwargs):
-    resp = requests.get(url, headers=UA, timeout=TIMEOUT, **kwargs)
+    headers = {**UA, **kwargs.pop("headers", {})}
+    resp = requests.get(url, headers=headers, timeout=TIMEOUT, **kwargs)
     resp.raise_for_status()
     return resp.json()
 
