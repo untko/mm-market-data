@@ -1,9 +1,9 @@
-name: Update fuel prices
+name: Update daily market data
 
 on:
   schedule:
-    # Daily at 08:17 Myanmar time, after Max Energy publishes the day's rates.
-    - cron: "47 1 * * *"
+    # Daily at 08:00 Myanmar time (UTC+06:30).
+    - cron: "30 1 * * *"
   workflow_dispatch:
 
 permissions:
@@ -28,13 +28,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Fetch fuel data
-        run: python update.py --topics fuel
+      - name: Fetch daily fuel and cash FX data
+        run: python update.py --topics cash-fx fuel
 
       - name: Commit updated data and dashboard
         run: |
           git config user.name "market-data-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ dashboard/market-trends.svg
-          git diff --cached --quiet || git commit -m "chore(data): update fuel $(date -u +'%Y-%m-%d')"
+          git diff --cached --quiet || git commit -m "chore(data): update daily market data $(date -u +'%Y-%m-%d')"
           git push

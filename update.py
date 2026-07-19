@@ -10,8 +10,8 @@ import fuel_history
 from dashboard import generate_dashboard
 from scrapers import common, exchange_rates, fuel, gold
 
-ALL_TOPICS = {"fx", "gold", "fuel"}
-DEFAULT_TOPICS = {"fx", "fuel"}
+ALL_TOPICS = {"cash-fx", "fx", "gold", "fuel"}
+DEFAULT_TOPICS = {"cash-fx", "fx", "fuel"}
 
 
 def _snapshot(relpath: str) -> dict | None:
@@ -26,7 +26,7 @@ def _snapshot(relpath: str) -> dict | None:
 
 def _merged_fx(existing: dict | None, fetched: dict) -> dict:
     merged = dict(existing or {})
-    for key in ("market", "official_reference", "interbank"):
+    for key in ("market", "official_reference", "interbank", "retail_cash"):
         if fetched.get(key) is not None:
             merged[key] = fetched[key]
     market = merged.get("market") or {}
@@ -38,6 +38,22 @@ def _merged_fx(existing: dict | None, fetched: dict) -> dict:
     return merged
 
 
+def _retail_cash_history_row(retail_cash: dict, *, ts_utc: str) -> dict:
+    row = {
+        "ts_utc": ts_utc,
+        "source_updated_at_raw": retail_cash.get("source_updated_at_raw"),
+    }
+    quotes = retail_cash.get("quotes") or {}
+    for currency in exchange_rates.SUPERRICH_THAILAND_CURRENCIES:
+        quote = quotes.get(currency) or {}
+        prefix = currency.lower()
+        row[f"{prefix}_denomination"] = quote.get("denomination")
+        row[f"{prefix}_buy_thb_per_unit"] = quote.get("buy_thb_per_unit")
+        row[f"{prefix}_sell_thb_per_unit"] = quote.get("sell_thb_per_unit")
+    row["source"] = retail_cash.get("source")
+    return row
+
+
 def run(topics: set[str]) -> int:
     unknown = topics - ALL_TOPICS
     if unknown:
@@ -45,19 +61,51 @@ def run(topics: set[str]) -> int:
 
     errors: list[str] = []
     now = common.utcnow()
+    existing_fx_document = common.read_json("exchange_rates.json") or {}
+    existing_fx_updated_at = existing_fx_document.get("updated_at_utc")
     existing_fx = _snapshot("exchange_rates.json")
     existing_gold = _snapshot("gold.json")
     existing_fuel = _snapshot("fuel.json")
 
     fx_observation = None
+    fx_errors: list[str] = []
+    fx_data_updated = False
     if "fx" in topics:
         fx_result = exchange_rates.fetch()
-        errors += fx_result["errors"]
-        fx_observation = fx_result["data"]
+        fx_errors += fx_result["errors"]
+        fx_observation = dict(fx_result["data"])
+        fx_data_updated = any(
+            fx_observation.get(key) is not None
+            for key in ("market", "official_reference", "interbank")
+        )
+        if fx_observation.get("market") is not None:
+            fx_observation["market"] = {
+                **fx_observation["market"],
+                "collected_at_utc": now,
+            }
+
+    if "cash-fx" in topics:
+        cash_fx_result = exchange_rates.fetch_retail_cash()
+        fx_errors += cash_fx_result["errors"]
+        if fx_observation is None:
+            fx_observation = {}
+        if cash_fx_result["data"] is not None:
+            fx_data_updated = True
+            fx_observation["retail_cash"] = {
+                **cash_fx_result["data"],
+                "collected_at_utc": now,
+            }
+
+    if fx_observation is not None:
+        errors += fx_errors
         fx_data = _merged_fx(existing_fx, fx_observation)
         common.write_json(
             "exchange_rates.json",
-            {"updated_at_utc": now, **fx_data, "errors": fx_result["errors"]},
+            {
+                "updated_at_utc": now if fx_data_updated else existing_fx_updated_at or now,
+                **fx_data,
+                "errors": fx_errors,
+            },
         )
     else:
         fx_data = existing_fx or {}
@@ -112,6 +160,19 @@ def run(topics: set[str]) -> int:
             },
             dedupe_keys=["usd_mmk_market", "thb_mmk_market", "usd_mmk_official"],
         )
+    if fx_observation and fx_observation.get("retail_cash"):
+        retail_cash = fx_observation["retail_cash"]
+        retail_row = _retail_cash_history_row(retail_cash, ts_utc=now)
+        retail_dedupe_keys = [
+            f"{currency.lower()}_{field}"
+            for currency in exchange_rates.SUPERRICH_THAILAND_CURRENCIES
+            for field in ("denomination", "buy_thb_per_unit", "sell_thb_per_unit")
+        ]
+        common.append_csv(
+            "history/superrich_thailand.csv",
+            retail_row,
+            dedupe_keys=retail_dedupe_keys,
+        )
     if gold_observation:
         common.append_csv(
             "history/gold.csv",
@@ -159,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
         nargs="+",
         choices=sorted(ALL_TOPICS),
         default=sorted(DEFAULT_TOPICS),
-        help="datasets to refresh (default: fx and fuel; gold is legacy/manual only)",
+        help="datasets to refresh (default: cash-fx, fx, and fuel; gold is legacy/manual only)",
     )
     args = parser.parse_args(argv)
     return run(set(args.topics))

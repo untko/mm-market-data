@@ -1,10 +1,11 @@
 {
-  "updated_at_utc": "2026-07-19T04:01:42+00:00",
+  "updated_at_utc": "2026-07-19T04:26:13+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
     "THB_MMK": 116.4384,
-    "source": "superrich.tech (aggregated Binance P2P USDT ads)"
+    "source": "superrich.tech (aggregated Binance P2P USDT ads)",
+    "collected_at_utc": "2026-07-19T04:26:13+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
@@ -19,5 +20,48 @@
     "source": "Frankfurter / ECB reference"
   },
   "market_vs_official_spread_pct": 102.38,
+  "retail_cash": {
+    "quote_currency": "THB",
+    "quotes": {
+      "USD": {
+        "pair": "USD/THB",
+        "denomination": "100",
+        "buy_thb_per_unit": 33.5,
+        "sell_thb_per_unit": 33.58,
+        "midpoint_thb_per_unit": 33.54
+      },
+      "GBP": {
+        "pair": "GBP/THB",
+        "denomination": "50",
+        "buy_thb_per_unit": 45.0,
+        "sell_thb_per_unit": 45.15,
+        "midpoint_thb_per_unit": 45.075
+      },
+      "EUR": {
+        "pair": "EUR/THB",
+        "denomination": "500-100",
+        "buy_thb_per_unit": 38.3,
+        "sell_thb_per_unit": 38.45,
+        "midpoint_thb_per_unit": 38.375
+      },
+      "JPY": {
+        "pair": "JPY/THB",
+        "denomination": "10000 - 5000",
+        "buy_thb_per_unit": 0.206,
+        "sell_thb_per_unit": 0.2075,
+        "midpoint_thb_per_unit": 0.20675
+      },
+      "CNY": {
+        "pair": "CNY/THB",
+        "denomination": "100",
+        "buy_thb_per_unit": 4.93,
+        "sell_thb_per_unit": 4.95,
+        "midpoint_thb_per_unit": 4.94
+      }
+    },
+    "collected_at_utc": "2026-07-19T04:26:13+00:00",
+    "source_updated_at_raw": "2026-07-19T08:53:17.866Z",
+    "source": "SuperRich Thailand retail cash exchange"
+  },
   "errors": []
 }

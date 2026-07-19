@@ -26,6 +26,14 @@ class DashboardTests(unittest.TestCase):
                     }
                 )
             )
+            (data_dir / "exchange_rates.json").write_text(
+                json.dumps(
+                    {
+                        "updated_at_utc": "2026-07-18T01:30:00+00:00",
+                        "market": {"collected_at_utc": "2026-07-17T14:09:03+00:00"},
+                    }
+                )
+            )
             for filename, fieldnames, row in (
                 (
                     "exchange_rates.csv",
@@ -65,6 +73,7 @@ class DashboardTests(unittest.TestCase):
         self.assertIn("Myanmar market dashboard", svg)
         self.assertIn("USD / MMK", svg)
         self.assertIn("4,250", svg)
+        self.assertIn("P2P · 17 Jul 20:39 MMT · 6 h", svg)
         self.assertNotIn("Gold / tical", svg)
         self.assertIn("95 octane / L", svg)
         self.assertIn("3,330", svg)

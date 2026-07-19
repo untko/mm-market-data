@@ -90,6 +90,17 @@ def _load_dashboard_model(data_dir: Path) -> DashboardModel:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return updated
 
+    def market_updated() -> datetime:
+        path = data_dir / "exchange_rates.json"
+        if not path.exists():
+            return updated
+        try:
+            payload = json.loads(path.read_text())
+            value = (payload.get("market") or {}).get("collected_at_utc")
+            return datetime.fromisoformat(value or payload["updated_at_utc"])
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+            return updated
+
     fx_history = _window(
         _read_history(data_dir / "history" / "exchange_rates.csv", ["usd_mmk_market"]),
         updated,
@@ -107,7 +118,7 @@ def _load_dashboard_model(data_dir: Path) -> DashboardModel:
         updated=updated,
         market=(latest.get("fx") or {}).get("market") or {},
         fuel=latest.get("fuel") or {},
-        fx_updated=snapshot_updated("exchange_rates.json").astimezone(YANGON_TZ),
+        fx_updated=market_updated().astimezone(YANGON_TZ),
         fuel_updated=snapshot_updated("fuel.json").astimezone(YANGON_TZ),
         fx_history=fx_history,
         fuel_history=[
