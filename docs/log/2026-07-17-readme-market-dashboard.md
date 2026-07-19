@@ -24,7 +24,7 @@ source date does not match the requested date.
 Automated collection is split by source behavior:
 
 - market FX every six hours;
-- Max Energy fuel daily at 08:17 Myanmar time.
+- Max Energy fuel and SuperRich cash FX in one daily batch at 08:00 Myanmar time.
 
 Both workflows regenerate and commit the dashboard after updating their own
 dataset. `update.py --topics ...` provides the same selective behavior locally,

@@ -16,16 +16,9 @@ public historical P2P series exists.
 | Dataset | What you get | Update cadence |
 | --- | --- | --- |
 | **MMK market FX** | USD/MMK, THB/MMK from **P2P (USDT) market rates** — *not* the official CBM rate | every 6 h |
-| **THB retail cash FX** | SuperRich Thailand buy/sell quotes for USD, GBP, EUR, JPY, and CNY banknotes | every 6 h |
+| **THB retail cash FX** | SuperRich Thailand buy/sell quotes for USD, GBP, EUR, JPY, and CNY banknotes | daily |
 | **Official vs market spread** | CBM fixed rate next to the market rate, with spread % | every 6 h |
 | **Fuel** | Max Energy gasoline (octane-95) & diesel median station prices in MMK/litre, + USD equivalents | daily |
-
-## Why not the official rate?
-
-The Central Bank of Myanmar fixes USD/MMK (e.g. 2100), which does not reflect the price
-people actually pay. This repo uses **USDT/MMK peer-to-peer ads** as the market benchmark
-(~4200+ in mid-2026), and also records the official rate so you can see the spread.
-Note P2P USDT rates track the cash/street rate closely but are not identical to it.
 
 ## Data sources
 
@@ -61,7 +54,7 @@ compatibility, but they are no longer displayed or refreshed automatically.
 {
   "updated_at_utc": "…",
   "fx": {
-    "market":            { "USD_MMK": 4250.0, "USD_THB": 36.5, "THB_MMK": 116.44, "source": "…" },
+    "market":            { "USD_MMK": 4250.0, "USD_THB": 36.5, "THB_MMK": 116.44, "collected_at_utc": "…", "source": "…" },
     "official_reference":{ "USD_MMK": 2100.0, "source": "Central Bank of Myanmar …" },
     "interbank":         { "USD_THB": 33.565, "USD_EUR": 0.872, "…": "…" },
     "retail_cash": {
@@ -79,6 +72,7 @@ compatibility, but they are no longer displayed or refreshed automatically.
         "JPY": { "pair": "JPY/THB", "…": "…" },
         "CNY": { "pair": "CNY/THB", "…": "…" }
       },
+      "collected_at_utc": "…",
       "source_updated_at_raw": "…",
       "source": "SuperRich Thailand retail cash exchange"
     },
@@ -98,9 +92,10 @@ compatibility, but they are no longer displayed or refreshed automatically.
    git push -u origin master
    ```
 
-2. That's it. Market FX runs every 6 hours (`cron: "23 */6 * * *"`), while Max Energy
-   fuel runs daily at 08:17 Myanmar time (`cron: "47 1 * * *"`). Both workflows update
-   the data, history, and README dashboard, and can also be triggered manually.
+2. That's it. Market FX runs every 6 hours (`cron: "23 */6 * * *"`). One daily batch
+   refreshes both Max Energy fuel and SuperRich cash FX at 08:00 Myanmar time
+   (`cron: "30 1 * * *"`). Both workflows update the data, history, and README dashboard,
+   and can also be triggered manually.
 
 > Scheduled workflows can be delayed under GitHub load, and GitHub disables schedules
 > after 60 days of repo inactivity — the bot commits usually keep it alive, but a manual
@@ -117,6 +112,7 @@ Selective refreshes and the reproducible fuel backfill:
 
 ```bash
 python update.py --topics fx
+python update.py --topics cash-fx
 python update.py --topics fuel
 python backfill_fuel.py --days 30
 ```
@@ -131,7 +127,8 @@ python backfill_fuel.py --days 30
   recorded in each quote because smaller notes can receive different rates.
 - **SuperRich's source timestamp is retained verbatim.** The site currently labels a
   Thailand wall-clock value with a UTC-like `Z`, so `source_updated_at_raw` is deliberately
-  not presented as an `as_of` instant. Use the snapshot's `updated_at_utc` for ordering.
+  not presented as an `as_of` instant. Use `collected_at_utc` for source freshness and
+  ordering.
 - **Fuel** figures are medians across the non-zero daily prices published for Max Energy's
   station network. They are direct MMK pump prices; USD equivalents are computed using the
   collected market FX rate. Actual prices vary by station and day.

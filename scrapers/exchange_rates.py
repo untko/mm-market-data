@@ -115,6 +115,14 @@ def _retail_cash_superrich_thailand() -> dict:
     }
 
 
+def fetch_retail_cash() -> dict:
+    """Fetch SuperRich Thailand cash quotes without refreshing other FX sources."""
+    try:
+        return {"data": _retail_cash_superrich_thailand(), "errors": []}
+    except Exception as exc:  # noqa: BLE001 - never crash the workflow
+        return {"data": None, "errors": [f"retail_cash_superrich_thailand: {exc}"]}
+
+
 def _official_cbm() -> dict:
     body = common.get_json(CBM_URL)
     as_of = None
@@ -157,12 +165,6 @@ def fetch() -> dict:
     except Exception as exc:  # noqa: BLE001
         errors.append(f"official_cbm: {exc}")
 
-    retail_cash = None
-    try:
-        retail_cash = _retail_cash_superrich_thailand()
-    except Exception as exc:  # noqa: BLE001
-        errors.append(f"retail_cash_superrich_thailand: {exc}")
-
     interbank = None
     try:
         interbank = _interbank()
@@ -173,7 +175,6 @@ def fetch() -> dict:
         "market": market,
         "official_reference": official,
         "interbank": interbank,
-        "retail_cash": retail_cash,
     }
     if market and official and official.get("USD_MMK"):
         result["market_vs_official_spread_pct"] = round(

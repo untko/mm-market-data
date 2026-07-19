@@ -4,7 +4,8 @@
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
     "THB_MMK": 116.4384,
-    "source": "superrich.tech (aggregated Binance P2P USDT ads)"
+    "source": "superrich.tech (aggregated Binance P2P USDT ads)",
+    "collected_at_utc": "2026-07-19T04:26:13+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
@@ -58,6 +59,7 @@
         "midpoint_thb_per_unit": 4.94
       }
     },
+    "collected_at_utc": "2026-07-19T04:26:13+00:00",
     "source_updated_at_raw": "2026-07-19T08:53:17.866Z",
     "source": "SuperRich Thailand retail cash exchange"
   },

@@ -10,8 +10,8 @@ import fuel_history
 from dashboard import generate_dashboard
 from scrapers import common, exchange_rates, fuel, gold
 
-ALL_TOPICS = {"fx", "gold", "fuel"}
-DEFAULT_TOPICS = {"fx", "fuel"}
+ALL_TOPICS = {"cash-fx", "fx", "gold", "fuel"}
+DEFAULT_TOPICS = {"cash-fx", "fx", "fuel"}
 
 
 def _snapshot(relpath: str) -> dict | None:
@@ -61,19 +61,51 @@ def run(topics: set[str]) -> int:
 
     errors: list[str] = []
     now = common.utcnow()
+    existing_fx_document = common.read_json("exchange_rates.json") or {}
+    existing_fx_updated_at = existing_fx_document.get("updated_at_utc")
     existing_fx = _snapshot("exchange_rates.json")
     existing_gold = _snapshot("gold.json")
     existing_fuel = _snapshot("fuel.json")
 
     fx_observation = None
+    fx_errors: list[str] = []
+    fx_data_updated = False
     if "fx" in topics:
         fx_result = exchange_rates.fetch()
-        errors += fx_result["errors"]
-        fx_observation = fx_result["data"]
+        fx_errors += fx_result["errors"]
+        fx_observation = dict(fx_result["data"])
+        fx_data_updated = any(
+            fx_observation.get(key) is not None
+            for key in ("market", "official_reference", "interbank")
+        )
+        if fx_observation.get("market") is not None:
+            fx_observation["market"] = {
+                **fx_observation["market"],
+                "collected_at_utc": now,
+            }
+
+    if "cash-fx" in topics:
+        cash_fx_result = exchange_rates.fetch_retail_cash()
+        fx_errors += cash_fx_result["errors"]
+        if fx_observation is None:
+            fx_observation = {}
+        if cash_fx_result["data"] is not None:
+            fx_data_updated = True
+            fx_observation["retail_cash"] = {
+                **cash_fx_result["data"],
+                "collected_at_utc": now,
+            }
+
+    if fx_observation is not None:
+        errors += fx_errors
         fx_data = _merged_fx(existing_fx, fx_observation)
         common.write_json(
             "exchange_rates.json",
-            {"updated_at_utc": now, **fx_data, "errors": fx_result["errors"]},
+            {
+                "updated_at_utc": now if fx_data_updated else existing_fx_updated_at or now,
+                **fx_data,
+                "errors": fx_errors,
+            },
         )
     else:
         fx_data = existing_fx or {}
@@ -188,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
         nargs="+",
         choices=sorted(ALL_TOPICS),
         default=sorted(DEFAULT_TOPICS),
-        help="datasets to refresh (default: fx and fuel; gold is legacy/manual only)",
+        help="datasets to refresh (default: cash-fx, fx, and fuel; gold is legacy/manual only)",
     )
     args = parser.parse_args(argv)
     return run(set(args.topics))
