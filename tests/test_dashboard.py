@@ -17,7 +17,27 @@ class DashboardTests(unittest.TestCase):
                 json.dumps(
                     {
                         "updated_at_utc": "2026-07-17T14:09:03+00:00",
-                        "fx": {"market": {"USD_MMK": 4250, "THB_MMK": 116.4384}},
+                        "fx": {
+                            "market": {"USD_MMK": 4250, "THB_MMK": 116.4384},
+                            "retail_cash": {
+                                "collected_at_utc": "2026-07-17T14:09:03+00:00",
+                                "quotes": {
+                                    currency: {
+                                        "pair": f"{currency}/THB",
+                                        "denomination": denomination,
+                                        "buy_thb_per_unit": buying,
+                                        "sell_thb_per_unit": selling,
+                                    }
+                                    for currency, denomination, buying, selling in (
+                                        ("USD", "100", 33.5, 33.58),
+                                        ("GBP", "50", 45.0, 45.15),
+                                        ("EUR", "500-100", 38.3, 38.45),
+                                        ("JPY", "10000-5000", 0.206, 0.2075),
+                                        ("CNY", "100", 4.93, 4.95),
+                                    )
+                                },
+                            },
+                        },
                         "fuel": {
                             "gasoline_95_mmk_per_litre_market": 3330,
                             "diesel_mmk_per_litre_market": 3220,
@@ -31,6 +51,9 @@ class DashboardTests(unittest.TestCase):
                     {
                         "updated_at_utc": "2026-07-18T01:30:00+00:00",
                         "market": {"collected_at_utc": "2026-07-17T14:09:03+00:00"},
+                        "retail_cash": {
+                            "collected_at_utc": "2026-07-17T14:09:03+00:00"
+                        },
                     }
                 )
             )
@@ -74,6 +97,12 @@ class DashboardTests(unittest.TestCase):
         self.assertIn("USD / MMK", svg)
         self.assertIn("4,250", svg)
         self.assertIn("P2P · 17 Jul 20:39 MMT · 6 h", svg)
+        self.assertIn("SuperRich Thailand cash FX", svg)
+        for pair in ("USD / THB", "GBP / THB", "EUR / THB", "JPY / THB", "CNY / THB"):
+            self.assertIn(pair, svg)
+        self.assertIn("Buy 33.50 · Sell 33.58", svg)
+        self.assertIn("Primary note: 100", svg)
+        self.assertIn("Daily · collected 17 Jul 20:39 MMT", svg)
         self.assertNotIn("Gold / tical", svg)
         self.assertIn("95 octane / L", svg)
         self.assertIn("3,330", svg)
@@ -135,6 +164,7 @@ class DashboardTests(unittest.TestCase):
             svg = output.read_text()
 
         self.assertIn("Collecting history · 1/8 points", svg)
+        self.assertIn("Daily · unavailable", svg)
         self.assertNotIn("9,016", svg)
 
 

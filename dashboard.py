@@ -17,9 +17,12 @@ DATA_DIR = ROOT / "data"
 OUTPUT_PATH = ROOT / "dashboard" / "market-trends.svg"
 
 WIDTH = 1200
-HEIGHT = 650
+HEIGHT = 840
 MIN_TREND_POINTS = 8
 YANGON_TZ = timezone(timedelta(hours=6, minutes=30))
+CASH_CURRENCIES = ("USD", "GBP", "EUR", "JPY", "CNY")
+TREND_Y = 398
+TREND_HEIGHT = 352
 
 INK = "#172033"
 MUTED = "#64748b"
@@ -43,8 +46,10 @@ class DashboardModel:
     latest: dict
     updated: datetime
     market: dict
+    retail_cash: dict
     fuel: dict
     fx_updated: datetime
+    cash_updated: datetime
     fuel_updated: datetime
     fx_history: list[tuple[datetime, list[float]]]
     fuel_history: list[tuple[datetime, list[float]]]
@@ -90,13 +95,13 @@ def _load_dashboard_model(data_dir: Path) -> DashboardModel:
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return updated
 
-    def market_updated() -> datetime:
+    def fx_section_updated(section: str) -> datetime:
         path = data_dir / "exchange_rates.json"
         if not path.exists():
             return updated
         try:
             payload = json.loads(path.read_text())
-            value = (payload.get("market") or {}).get("collected_at_utc")
+            value = (payload.get(section) or {}).get("collected_at_utc")
             return datetime.fromisoformat(value or payload["updated_at_utc"])
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             return updated
@@ -117,8 +122,10 @@ def _load_dashboard_model(data_dir: Path) -> DashboardModel:
         latest=latest,
         updated=updated,
         market=(latest.get("fx") or {}).get("market") or {},
+        retail_cash=(latest.get("fx") or {}).get("retail_cash") or {},
         fuel=latest.get("fuel") or {},
-        fx_updated=market_updated().astimezone(YANGON_TZ),
+        fx_updated=fx_section_updated("market").astimezone(YANGON_TZ),
+        cash_updated=fx_section_updated("retail_cash").astimezone(YANGON_TZ),
         fuel_updated=snapshot_updated("fuel.json").astimezone(YANGON_TZ),
         fx_history=fx_history,
         fuel_history=[
@@ -148,9 +155,69 @@ def _card(x, width, title, value, note, accent) -> str:
     )
 
 
-def _trend_panel(x, width, title, subtitle, series: list[TrendSeries]) -> str:
+def _cash_fx_panel(retail_cash: dict, collected_at: datetime) -> str:
     y = 218
-    height = 352
+    height = 156
+    quotes = retail_cash.get("quotes") or {}
+    freshness = (
+        f"Daily · collected {collected_at.strftime('%d %b %H:%M')} MMT"
+        if quotes
+        else "Daily · unavailable"
+    )
+    parts = [
+        f'<rect x="32" y="{y}" width="1136" height="{height}" rx="12" class="panel"/>',
+        _text(50, y + 31, "SuperRich Thailand cash FX", "panel-title"),
+        _text(
+            50,
+            y + 53,
+            "THB per foreign currency unit · SuperRich buy / sell · primary banknote",
+            "panel-subtitle",
+        ),
+        _text(
+            1150,
+            y + 31,
+            freshness,
+            "freshness",
+            "end",
+        ),
+    ]
+    cell_width = 220
+    for index, currency in enumerate(CASH_CURRENCIES):
+        quote = quotes.get(currency) or {}
+        x = 50 + index * cell_width
+        if index:
+            separator_x = x - 14
+            parts.append(
+                f'<line x1="{separator_x}" y1="{y + 68}" x2="{separator_x}" '
+                f'y2="{y + 137}" class="grid"/>'
+            )
+        pair = str(quote.get("pair") or f"{currency}/THB").replace("/", " / ")
+        buying = quote.get("buy_thb_per_unit")
+        selling = quote.get("sell_thb_per_unit")
+        decimals = 4 if currency == "JPY" else 2
+        parts.extend(
+            [
+                _text(x, y + 82, pair, "cash-pair"),
+                _text(
+                    x,
+                    y + 111,
+                    f"Buy {_number(buying, decimals)} · Sell {_number(selling, decimals)}",
+                    "cash-value",
+                ),
+                _text(
+                    x,
+                    y + 135,
+                    f"Primary note: {quote.get('denomination') or '—'}",
+                    "cash-note",
+                ),
+            ]
+        )
+    return "".join(parts)
+
+
+def _trend_panel(x, width, title, subtitle, series: list[TrendSeries]) -> str:
+    y = TREND_Y
+    height = TREND_HEIGHT
     parts = [
         f'<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="12" class="panel"/>',
         _text(x + 18, y + 31, title, "panel-title"),
@@ -252,8 +319,10 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
     latest = model.latest
     updated = model.updated
     market = model.market
+    retail_cash = model.retail_cash
     fuel = model.fuel
     fx_updated = model.fx_updated
+    cash_updated = model.cash_updated
     fuel_updated = model.fuel_updated
     fx_history = model.fx_history
     fuel_history_points = model.fuel_history
@@ -265,7 +334,7 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
         '<?xml version="1.0" encoding="UTF-8"?>',
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" role="img">',
         "<title>Myanmar market dashboard</title>",
-        "<desc>Latest Myanmar market exchange and fuel values with thirty-day trends.</desc>",
+        "<desc>Latest Myanmar P2P, SuperRich Thailand cash exchange, and fuel values with thirty-day trends.</desc>",
         """<style>
             text { font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; fill: #172033; }
             .panel { fill: #ffffff; stroke: #dbe3ef; stroke-width: 1; }
@@ -275,6 +344,9 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
             .card-label { font-size: 12px; fill: #64748b; font-weight: 600; }
             .card-value { font-size: 25px; font-weight: 700; }
             .card-note { font-size: 11px; fill: #64748b; }
+            .cash-pair { font-size: 12px; fill: #64748b; font-weight: 650; }
+            .cash-value { font-size: 17px; font-weight: 700; }
+            .cash-note { font-size: 11px; fill: #64748b; }
             .panel-title { font-size: 16px; font-weight: 700; }
             .panel-subtitle { font-size: 11px; fill: #64748b; }
             .empty-title { font-size: 16px; font-weight: 650; fill: #64748b; }
@@ -326,6 +398,8 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
     for index, card in enumerate(cards):
         svg.append(_card(32 + index * 288, 272, *card))
 
+    svg.append(_cash_fx_panel(retail_cash, cash_updated))
+
     svg.append(
         _trend_panel(
             32,
@@ -369,13 +443,13 @@ def generate_dashboard(data_dir: Path = DATA_DIR, output_path: Path = OUTPUT_PAT
         [
             _text(
                 32,
-                620,
-                "Sources: P2P market rates · Max Energy Myanmar",
+                810,
+                "Sources: P2P market rates · SuperRich Thailand · Max Energy Myanmar",
                 "footer",
             ),
             _text(
                 WIDTH - 32,
-                620,
+                810,
                 "Generated from committed JSON and CSV history",
                 "footer",
                 "end",
