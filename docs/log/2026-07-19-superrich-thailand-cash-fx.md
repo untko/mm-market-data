@@ -30,6 +30,10 @@ The market and retail-cash sections each carry `collected_at_utc`. Cash-only run
 advance the P2P timestamp, and a failed cash request preserves both the last good quote
 and its collection time. The dashboard uses the market-specific timestamp for P2P cards.
 
+The README dashboard includes a dedicated SuperRich small-multiples row for USD/THB,
+GBP/THB, EUR/THB, JPY/THB, and CNY/THB. Each cell shows the retail buy and sell quotes,
+primary banknote denomination, and the cash feed's own collection time.
+
 The endpoint's `dateTime` currently looks like Thailand wall-clock time with a
 misleading `Z` suffix. It is therefore preserved only as
 `source_updated_at_raw`. Snapshot `updated_at_utc` and history `ts_utc` remain the
