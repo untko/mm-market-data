@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-07-22T03:52:57+00:00",
+  "updated_at_utc": "2026-07-22T04:47:08+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
@@ -26,9 +26,9 @@
       "USD": {
         "pair": "USD/THB",
         "denomination": "100",
-        "buy_thb_per_unit": 33.57,
-        "sell_thb_per_unit": 33.62,
-        "midpoint_thb_per_unit": 33.595
+        "buy_thb_per_unit": 33.72,
+        "sell_thb_per_unit": 33.75,
+        "midpoint_thb_per_unit": 33.735
       },
       "GBP": {
         "pair": "GBP/THB",
@@ -40,9 +40,9 @@
       "EUR": {
         "pair": "EUR/THB",
         "denomination": "500-100",
-        "buy_thb_per_unit": 38.25,
-        "sell_thb_per_unit": 38.4,
-        "midpoint_thb_per_unit": 38.325
+        "buy_thb_per_unit": 38.4,
+        "sell_thb_per_unit": 38.55,
+        "midpoint_thb_per_unit": 38.475
       },
       "JPY": {
         "pair": "JPY/THB",
@@ -54,14 +54,14 @@
       "CNY": {
         "pair": "CNY/THB",
         "denomination": "100",
-        "buy_thb_per_unit": 4.94,
-        "sell_thb_per_unit": 4.96,
-        "midpoint_thb_per_unit": 4.95
+        "buy_thb_per_unit": 4.96,
+        "sell_thb_per_unit": 4.98,
+        "midpoint_thb_per_unit": 4.97
       }
     },
-    "source_updated_at_raw": "2026-07-21T11:42:44.016Z",
+    "source_updated_at_raw": "2026-07-22T11:30:28.866Z",
     "source": "SuperRich Thailand retail cash exchange",
-    "collected_at_utc": "2026-07-21T04:47:30+00:00"
+    "collected_at_utc": "2026-07-22T04:47:08+00:00"
   },
   "errors": []
 }
