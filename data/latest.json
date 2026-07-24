@@ -1,18 +1,18 @@
 {
-  "updated_at_utc": "2026-07-24T09:00:35+00:00",
-  "updated_at_yangon": "2026-07-24T15:30:57+06:30",
+  "updated_at_utc": "2026-07-24T14:17:53+00:00",
+  "updated_at_yangon": "2026-07-24T20:47:57+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
       "USD_THB": 36.5,
       "THB_MMK": 116.4384,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-07-24T09:00:35+00:00"
+      "collected_at_utc": "2026-07-24T14:17:53+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
-      "THB_MMK": 62.08,
-      "as_of": "2026-07-23T08:00:00+00:00",
+      "THB_MMK": 62.31,
+      "as_of": "2026-07-24T08:00:00+00:00",
       "source": "Central Bank of Myanmar (official fixed rate)"
     },
     "interbank": {
@@ -87,7 +87,5 @@
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
-  "errors": [
-    "interbank: 522 Server Error: <none> for url: https://api.frankfurter.dev/v1/latest?base=USD&symbols=THB%2CEUR"
-  ]
+  "errors": []
 }
