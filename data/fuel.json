@@ -1,13 +1,13 @@
 {
-  "updated_at_utc": "2026-07-23T04:52:02+00:00",
-  "gasoline_95_usd_per_litre": 0.7835,
-  "diesel_usd_per_litre": 0.7576,
-  "gasoline_95_mmk_per_litre_market": 3330.0,
-  "diesel_mmk_per_litre_market": 3220.0,
-  "as_of": "2026-07-23",
+  "updated_at_utc": "2026-07-24T04:48:49+00:00",
+  "gasoline_95_usd_per_litre": 0.8247,
+  "diesel_usd_per_litre": 0.8482,
+  "gasoline_95_mmk_per_litre_market": 3505.0,
+  "diesel_mmk_per_litre_market": 3605.0,
+  "as_of": "2026-07-24",
   "stations_sampled": {
-    "gasoline_95": 77,
-    "diesel": 77
+    "gasoline_95": 79,
+    "diesel": 79
   },
   "source": "Max Energy Myanmar daily station prices (median across stations)"
 }

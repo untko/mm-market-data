@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-07-24T03:50:38+00:00",
-  "updated_at_yangon": "2026-07-24T10:20:41+06:30",
+  "updated_at_utc": "2026-07-24T04:48:49+00:00",
+  "updated_at_yangon": "2026-07-24T11:19:41+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -28,42 +28,42 @@
         "USD": {
           "pair": "USD/THB",
           "denomination": "100",
-          "buy_thb_per_unit": 33.7,
-          "sell_thb_per_unit": 33.75,
-          "midpoint_thb_per_unit": 33.725
+          "buy_thb_per_unit": 33.75,
+          "sell_thb_per_unit": 33.78,
+          "midpoint_thb_per_unit": 33.765
         },
         "GBP": {
           "pair": "GBP/THB",
           "denomination": "50",
-          "buy_thb_per_unit": 45.1,
-          "sell_thb_per_unit": 45.2,
-          "midpoint_thb_per_unit": 45.15
+          "buy_thb_per_unit": 44.9,
+          "sell_thb_per_unit": 45.05,
+          "midpoint_thb_per_unit": 44.975
         },
         "EUR": {
           "pair": "EUR/THB",
           "denomination": "500-100",
-          "buy_thb_per_unit": 38.45,
-          "sell_thb_per_unit": 38.55,
-          "midpoint_thb_per_unit": 38.5
+          "buy_thb_per_unit": 38.35,
+          "sell_thb_per_unit": 38.5,
+          "midpoint_thb_per_unit": 38.425
         },
         "JPY": {
           "pair": "JPY/THB",
           "denomination": "10000 - 5000",
-          "buy_thb_per_unit": 0.2065,
-          "sell_thb_per_unit": 0.2075,
-          "midpoint_thb_per_unit": 0.207
+          "buy_thb_per_unit": 0.2055,
+          "sell_thb_per_unit": 0.207,
+          "midpoint_thb_per_unit": 0.20625
         },
         "CNY": {
           "pair": "CNY/THB",
           "denomination": "100",
-          "buy_thb_per_unit": 4.98,
-          "sell_thb_per_unit": 5.0,
-          "midpoint_thb_per_unit": 4.99
+          "buy_thb_per_unit": 4.99,
+          "sell_thb_per_unit": 5.01,
+          "midpoint_thb_per_unit": 5.0
         }
       },
-      "source_updated_at_raw": "2026-07-23T11:43:02.533Z",
+      "source_updated_at_raw": "2026-07-24T11:32:31.436Z",
       "source": "SuperRich Thailand retail cash exchange",
-      "collected_at_utc": "2026-07-23T04:52:02+00:00"
+      "collected_at_utc": "2026-07-24T04:48:49+00:00"
     }
   },
   "gold": {
@@ -76,14 +76,14 @@
     "mmk_per_tical_market": 8924540.02
   },
   "fuel": {
-    "gasoline_95_usd_per_litre": 0.7835,
-    "diesel_usd_per_litre": 0.7576,
-    "gasoline_95_mmk_per_litre_market": 3330.0,
-    "diesel_mmk_per_litre_market": 3220.0,
-    "as_of": "2026-07-23",
+    "gasoline_95_usd_per_litre": 0.8247,
+    "diesel_usd_per_litre": 0.8482,
+    "gasoline_95_mmk_per_litre_market": 3505.0,
+    "diesel_mmk_per_litre_market": 3605.0,
+    "as_of": "2026-07-24",
     "stations_sampled": {
-      "gasoline_95": 77,
-      "diesel": 77
+      "gasoline_95": 79,
+      "diesel": 79
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
