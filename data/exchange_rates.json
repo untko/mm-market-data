@@ -1,11 +1,11 @@
 {
-  "updated_at_utc": "2026-07-31T05:00:54+00:00",
+  "updated_at_utc": "2026-07-31T09:21:07+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
     "THB_MMK": 116.4384,
     "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-    "collected_at_utc": "2026-07-31T03:56:58+00:00"
+    "collected_at_utc": "2026-07-31T09:21:07+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
@@ -63,5 +63,7 @@
     "source": "SuperRich Thailand retail cash exchange",
     "collected_at_utc": "2026-07-31T05:00:54+00:00"
   },
-  "errors": []
+  "errors": [
+    "official_cbm: 522 Server Error: <none> for url: https://forex.cbm.gov.mm/api/latest"
+  ]
 }
