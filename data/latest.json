@@ -1,24 +1,24 @@
 {
-  "updated_at_utc": "2026-07-31T09:21:07+00:00",
-  "updated_at_yangon": "2026-07-31T15:51:28+06:30",
+  "updated_at_utc": "2026-07-31T14:42:29+00:00",
+  "updated_at_yangon": "2026-07-31T21:12:41+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
       "USD_THB": 36.5,
       "THB_MMK": 116.4384,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-07-31T09:21:07+00:00"
+      "collected_at_utc": "2026-07-31T14:42:29+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
-      "THB_MMK": 62.43,
-      "as_of": "2026-07-30T08:00:00+00:00",
+      "THB_MMK": 62.89,
+      "as_of": "2026-07-31T08:00:00+00:00",
       "source": "Central Bank of Myanmar (official fixed rate)"
     },
     "interbank": {
-      "USD_THB": 33.545,
-      "USD_EUR": 0.87138,
-      "as_of": "2026-07-30",
+      "USD_THB": 33.465,
+      "USD_EUR": 0.8707,
+      "as_of": "2026-07-31",
       "source": "Frankfurter / ECB reference"
     },
     "market_vs_official_spread_pct": 102.38,
@@ -87,7 +87,5 @@
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
-  "errors": [
-    "official_cbm: 522 Server Error: <none> for url: https://forex.cbm.gov.mm/api/latest"
-  ]
+  "errors": []
 }
