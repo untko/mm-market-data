@@ -8,6 +8,9 @@ committed back to this repo, so the `data/` folder doubles as a free JSON API vi
 
 [![Myanmar market dashboard](dashboard/market-trends.svg)](data/latest.json)
 
+[Open the latest JSON snapshot](data/latest.json) · The graphic compares the live P2P rate
+with the CBM reference and shows fuel and retail-cash context at a glance.
+
 The dashboard is regenerated from the committed JSON snapshots and CSV history after
 every scheduled pull. Fuel includes a source-backed 30-day Max Energy backfill; the P2P
 FX trend begins with this repository's first actual observation because no equivalent

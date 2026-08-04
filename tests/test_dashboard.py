@@ -18,7 +18,13 @@ class DashboardTests(unittest.TestCase):
                     {
                         "updated_at_utc": "2026-07-17T14:09:03+00:00",
                         "fx": {
-                            "market": {"USD_MMK": 4250, "THB_MMK": 116.4384},
+                            "market": {
+                                "USD_MMK": 4250,
+                                "THB_MMK": 116.4384,
+                                "collected_at_utc": "2026-07-17T14:09:03+00:00",
+                            },
+                            "official_reference": {"USD_MMK": 2100},
+                            "market_vs_official_spread_pct": 102.38,
                             "retail_cash": {
                                 "collected_at_utc": "2026-07-17T14:09:03+00:00",
                                 "quotes": {
@@ -61,7 +67,7 @@ class DashboardTests(unittest.TestCase):
                 (
                     "exchange_rates.csv",
                     ["ts_utc", "usd_mmk_market"],
-                    ["2026-07-17T14:09:03+00:00", "4250"],
+                    ["2026-07-17T04:09:03+00:00", "4250"],
                 ),
                 (
                     "fuel.csv",
@@ -100,13 +106,18 @@ class DashboardTests(unittest.TestCase):
         self.assertIn("SuperRich Thailand cash FX", svg)
         for pair in ("USD / THB", "GBP / THB", "EUR / THB", "JPY / THB", "CNY / THB"):
             self.assertIn(pair, svg)
-        self.assertIn("Buy 33.50 · Sell 33.58", svg)
-        self.assertIn("Primary note: 100", svg)
+        self.assertIn("Buy 33.50", svg)
+        self.assertIn('class="sparkline"', svg)
+        self.assertNotIn("Sell 33.58", svg)
         self.assertIn("Daily · collected 17 Jul 20:39 MMT", svg)
         self.assertNotIn("Gold / tical", svg)
         self.assertIn("95 octane / L", svg)
         self.assertIn("3,330", svg)
-        self.assertIn("Collecting history · 1/8 points", svg)
+        self.assertIn("Market USD / MMK trend", svg)
+        self.assertIn("P2P market", svg)
+        self.assertIn("CBM official", svg)
+        self.assertIn("2 observations", svg)
+        self.assertIn("<polyline", svg)
         self.assertIn("1 scheduled", svg)
 
     def test_fuel_trend_excludes_iso_dated_rows_from_other_sources(self):
@@ -163,9 +174,47 @@ class DashboardTests(unittest.TestCase):
             dashboard.generate_dashboard(data_dir=data_dir, output_path=output)
             svg = output.read_text()
 
-        self.assertIn("Collecting history · 1/8 points", svg)
+        self.assertIn("No trend observations", svg)
         self.assertIn("Daily · unavailable", svg)
         self.assertNotIn("9,016", svg)
+
+    def test_fx_trend_includes_official_reference_after_history_is_established(self):
+        with TemporaryDirectory() as tmp:
+            data_dir = Path(tmp) / "data"
+            history_dir = data_dir / "history"
+            history_dir.mkdir(parents=True)
+            (data_dir / "latest.json").write_text(
+                json.dumps(
+                    {
+                        "updated_at_utc": "2026-07-17T14:09:03+00:00",
+                        "fx": {
+                            "market": {"USD_MMK": 4250},
+                            "official_reference": {"USD_MMK": 2100},
+                        },
+                        "fuel": {},
+                        "errors": [],
+                    }
+                )
+            )
+            with (history_dir / "exchange_rates.csv").open("w", newline="") as fh:
+                writer = csv.DictWriter(fh, fieldnames=["ts_utc", "usd_mmk_market"])
+                writer.writeheader()
+                for day in range(10, 18):
+                    writer.writerow(
+                        {
+                            "ts_utc": f"2026-07-{day:02d}T00:00:00+00:00",
+                            "usd_mmk_market": 4200 + day,
+                        }
+                    )
+
+            output = Path(tmp) / "dashboard.svg"
+            dashboard.generate_dashboard(data_dir=data_dir, output_path=output)
+            svg = output.read_text()
+
+        self.assertIn("Last 30 days · P2P market with CBM reference", svg)
+        self.assertIn("CBM official", svg)
+        self.assertIn('stroke-dasharray="4 4"', svg)
+        self.assertNotIn("Same-scale comparison", svg)
 
 
 if __name__ == "__main__":

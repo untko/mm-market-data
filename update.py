@@ -158,7 +158,9 @@ def run(topics: set[str]) -> int:
                 "spread_pct": fx_data.get("market_vs_official_spread_pct"),
                 "source": observed_market.get("source"),
             },
-            dedupe_keys=["usd_mmk_market", "thb_mmk_market", "usd_mmk_official"],
+            # Keep every timestamped FX observation so the README can show a true
+            # time trend even when the quoted rates are unchanged between pulls.
+            dedupe_keys=["ts_utc"],
         )
     if fx_observation and fx_observation.get("retail_cash"):
         retail_cash = fx_observation["retail_cash"]

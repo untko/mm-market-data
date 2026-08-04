@@ -1,3 +1,4 @@
+import csv
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -70,6 +71,49 @@ class SelectiveUpdateTests(unittest.TestCase):
         cash_fx_fetch.assert_not_called()
         gold_fetch.assert_not_called()
         fuel_fetch.assert_not_called()
+
+    def test_fx_refresh_keeps_unchanged_observations_for_trend(self):
+        with TemporaryDirectory() as tmp:
+            data_dir = Path(tmp) / "data"
+            data_dir.mkdir()
+            self._seed_snapshots(
+                data_dir,
+                {
+                    "updated_at_utc": "old",
+                    "market": {"USD_MMK": 4250},
+                },
+            )
+            fx_result = {
+                "data": {
+                    "market": {"USD_MMK": 4250, "USD_THB": 36.5, "THB_MMK": 116.4384},
+                    "official_reference": {"USD_MMK": 2100},
+                },
+                "errors": [],
+            }
+
+            with (
+                patch.object(common, "DATA_DIR", str(data_dir)),
+                patch(
+                    "update.common.utcnow",
+                    side_effect=[
+                        "2026-07-20T01:30:00+00:00",
+                        "2026-07-20T07:30:00+00:00",
+                    ],
+                ),
+                patch("update.exchange_rates.fetch", return_value=fx_result),
+            ):
+                update.run({"fx"})
+                update.run({"fx"})
+
+            with (data_dir / "history" / "exchange_rates.csv").open(newline="") as fh:
+                rows = list(csv.DictReader(fh))
+
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(
+            [row["ts_utc"] for row in rows],
+            ["2026-07-20T01:30:00+00:00", "2026-07-20T07:30:00+00:00"],
+        )
+        self.assertEqual([row["usd_mmk_market"] for row in rows], ["4250", "4250"])
 
     def test_cash_fx_refresh_is_independent_and_deduplicates_unchanged_history(self):
         with TemporaryDirectory() as tmp:
