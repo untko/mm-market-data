@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-08-10T02:38:31+00:00",
-  "updated_at_yangon": "2026-08-10T09:08:33+06:30",
+  "updated_at_utc": "2026-08-10T03:27:00+00:00",
+  "updated_at_yangon": "2026-08-10T09:57:17+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -28,30 +28,30 @@
         "USD": {
           "pair": "USD/THB",
           "denomination": "100",
-          "buy_thb_per_unit": 32.99,
-          "sell_thb_per_unit": 33.03,
-          "midpoint_thb_per_unit": 33.01
+          "buy_thb_per_unit": 32.95,
+          "sell_thb_per_unit": 33.01,
+          "midpoint_thb_per_unit": 32.98
         },
         "GBP": {
           "pair": "GBP/THB",
           "denomination": "50",
-          "buy_thb_per_unit": 44.25,
-          "sell_thb_per_unit": 44.4,
-          "midpoint_thb_per_unit": 44.325
+          "buy_thb_per_unit": 44.4,
+          "sell_thb_per_unit": 44.5,
+          "midpoint_thb_per_unit": 44.45
         },
         "EUR": {
           "pair": "EUR/THB",
           "denomination": "500-100",
-          "buy_thb_per_unit": 37.95,
-          "sell_thb_per_unit": 38.05,
-          "midpoint_thb_per_unit": 38.0
+          "buy_thb_per_unit": 38.0,
+          "sell_thb_per_unit": 38.15,
+          "midpoint_thb_per_unit": 38.075
         },
         "JPY": {
           "pair": "JPY/THB",
           "denomination": "10000 - 5000",
-          "buy_thb_per_unit": 0.2075,
-          "sell_thb_per_unit": 0.2085,
-          "midpoint_thb_per_unit": 0.208
+          "buy_thb_per_unit": 0.208,
+          "sell_thb_per_unit": 0.2095,
+          "midpoint_thb_per_unit": 0.20875
         },
         "CNY": {
           "pair": "CNY/THB",
@@ -61,9 +61,9 @@
           "midpoint_thb_per_unit": 4.89
         }
       },
-      "source_updated_at_raw": "2026-08-09T10:02:54.026Z",
+      "source_updated_at_raw": "2026-08-10T10:22:27.433Z",
       "source": "SuperRich Thailand retail cash exchange",
-      "collected_at_utc": "2026-08-09T03:16:50+00:00"
+      "collected_at_utc": "2026-08-10T03:27:00+00:00"
     }
   },
   "gold": {
@@ -80,7 +80,7 @@
     "diesel_usd_per_litre": 0.9882,
     "gasoline_95_mmk_per_litre_market": 3990.0,
     "diesel_mmk_per_litre_market": 4200.0,
-    "as_of": "2026-08-09",
+    "as_of": "2026-08-10",
     "stations_sampled": {
       "gasoline_95": 77,
       "diesel": 77
