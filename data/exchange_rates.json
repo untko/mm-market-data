@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-08-11T13:48:32+00:00",
+  "updated_at_utc": "2026-08-11T19:30:00+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
@@ -9,14 +9,14 @@
   },
   "official_reference": {
     "USD_MMK": 2100.0,
-    "THB_MMK": 63.69,
-    "as_of": "2026-08-10T08:00:00+00:00",
+    "THB_MMK": 63.35,
+    "as_of": "2026-08-11T08:00:00+00:00",
     "source": "Central Bank of Myanmar (official fixed rate)"
   },
   "interbank": {
-    "USD_THB": 33.013,
-    "USD_EUR": 0.86543,
-    "as_of": "2026-08-10",
+    "USD_THB": 33.105,
+    "USD_EUR": 0.86655,
+    "as_of": "2026-08-11",
     "source": "Frankfurter / ECB reference"
   },
   "market_vs_official_spread_pct": 102.38,
@@ -63,5 +63,8 @@
     "source": "SuperRich Thailand retail cash exchange",
     "collected_at_utc": "2026-08-11T03:19:34+00:00"
   },
-  "errors": []
+  "errors": [
+    "_market_from_superrich: HTTPSConnectionPool(host='superrich.tech', port=443): Max retries exceeded with url: /api/p2p-rates (Caused by NameResolutionError(\"HTTPSConnection(host='superrich.tech', port=443): Failed to resolve 'superrich.tech' ([Errno -3] Temporary failure in name resolution)\"))",
+    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+  ]
 }
