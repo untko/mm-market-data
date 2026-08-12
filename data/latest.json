@@ -1,13 +1,13 @@
 {
-  "updated_at_utc": "2026-08-11T19:30:00+00:00",
-  "updated_at_yangon": "2026-08-12T02:00:12+06:30",
+  "updated_at_utc": "2026-08-12T03:00:30+00:00",
+  "updated_at_yangon": "2026-08-12T09:30:58+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
       "USD_THB": 36.5,
       "THB_MMK": 116.4384,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-08-11T13:48:32+00:00"
+      "collected_at_utc": "2026-08-12T03:00:30+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
@@ -88,7 +88,6 @@
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
   "errors": [
-    "_market_from_superrich: HTTPSConnectionPool(host='superrich.tech', port=443): Max retries exceeded with url: /api/p2p-rates (Caused by NameResolutionError(\"HTTPSConnection(host='superrich.tech', port=443): Failed to resolve 'superrich.tech' ([Errno -3] Temporary failure in name resolution)\"))",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+    "interbank: HTTPSConnectionPool(host='api.frankfurter.dev', port=443): Read timed out. (read timeout=25)"
   ]
 }
