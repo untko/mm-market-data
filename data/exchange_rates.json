@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-08-12T03:00:30+00:00",
+  "updated_at_utc": "2026-08-12T03:38:12+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
@@ -26,23 +26,23 @@
       "USD": {
         "pair": "USD/THB",
         "denomination": "100",
-        "buy_thb_per_unit": 32.96,
-        "sell_thb_per_unit": 33.02,
-        "midpoint_thb_per_unit": 32.99
+        "buy_thb_per_unit": 33.05,
+        "sell_thb_per_unit": 33.12,
+        "midpoint_thb_per_unit": 33.085
       },
       "GBP": {
         "pair": "GBP/THB",
         "denomination": "50",
-        "buy_thb_per_unit": 44.5,
-        "sell_thb_per_unit": 44.6,
-        "midpoint_thb_per_unit": 44.55
+        "buy_thb_per_unit": 44.6,
+        "sell_thb_per_unit": 44.75,
+        "midpoint_thb_per_unit": 44.675
       },
       "EUR": {
         "pair": "EUR/THB",
         "denomination": "500-100",
-        "buy_thb_per_unit": 38.0,
-        "sell_thb_per_unit": 38.1,
-        "midpoint_thb_per_unit": 38.05
+        "buy_thb_per_unit": 38.1,
+        "sell_thb_per_unit": 38.2,
+        "midpoint_thb_per_unit": 38.15
       },
       "JPY": {
         "pair": "JPY/THB",
@@ -54,16 +54,14 @@
       "CNY": {
         "pair": "CNY/THB",
         "denomination": "100",
-        "buy_thb_per_unit": 4.88,
-        "sell_thb_per_unit": 4.9,
-        "midpoint_thb_per_unit": 4.89
+        "buy_thb_per_unit": 4.9,
+        "sell_thb_per_unit": 4.93,
+        "midpoint_thb_per_unit": 4.915
       }
     },
-    "source_updated_at_raw": "2026-08-11T10:14:36.296Z",
+    "source_updated_at_raw": "2026-08-12T09:53:56.510Z",
     "source": "SuperRich Thailand retail cash exchange",
-    "collected_at_utc": "2026-08-11T03:19:34+00:00"
+    "collected_at_utc": "2026-08-12T03:38:12+00:00"
   },
-  "errors": [
-    "interbank: HTTPSConnectionPool(host='api.frankfurter.dev', port=443): Read timed out. (read timeout=25)"
-  ]
+  "errors": []
 }
