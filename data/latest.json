@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-08-14T03:02:58+00:00",
-  "updated_at_yangon": "2026-08-14T09:33:00+06:30",
+  "updated_at_utc": "2026-08-14T03:39:29+00:00",
+  "updated_at_yangon": "2026-08-14T10:10:15+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -28,23 +28,23 @@
         "USD": {
           "pair": "USD/THB",
           "denomination": "100",
-          "buy_thb_per_unit": 33.02,
-          "sell_thb_per_unit": 33.1,
-          "midpoint_thb_per_unit": 33.06
+          "buy_thb_per_unit": 33.13,
+          "sell_thb_per_unit": 33.2,
+          "midpoint_thb_per_unit": 33.165
         },
         "GBP": {
           "pair": "GBP/THB",
           "denomination": "50",
-          "buy_thb_per_unit": 44.5,
-          "sell_thb_per_unit": 44.65,
-          "midpoint_thb_per_unit": 44.575
+          "buy_thb_per_unit": 44.65,
+          "sell_thb_per_unit": 44.8,
+          "midpoint_thb_per_unit": 44.725
         },
         "EUR": {
           "pair": "EUR/THB",
           "denomination": "500-100",
-          "buy_thb_per_unit": 38.0,
-          "sell_thb_per_unit": 38.15,
-          "midpoint_thb_per_unit": 38.075
+          "buy_thb_per_unit": 38.15,
+          "sell_thb_per_unit": 38.3,
+          "midpoint_thb_per_unit": 38.225
         },
         "JPY": {
           "pair": "JPY/THB",
@@ -61,9 +61,9 @@
           "midpoint_thb_per_unit": 4.925
         }
       },
-      "source_updated_at_raw": "2026-08-13T10:32:10.826Z",
+      "source_updated_at_raw": "2026-08-14T10:36:38.033Z",
       "source": "SuperRich Thailand retail cash exchange",
-      "collected_at_utc": "2026-08-13T03:41:37+00:00"
+      "collected_at_utc": "2026-08-14T03:39:29+00:00"
     }
   },
   "gold": {
@@ -76,11 +76,11 @@
     "mmk_per_tical_market": 8924540.02
   },
   "fuel": {
-    "gasoline_95_usd_per_litre": 0.9388,
-    "diesel_usd_per_litre": 0.9882,
-    "gasoline_95_mmk_per_litre_market": 3990.0,
-    "diesel_mmk_per_litre_market": 4200.0,
-    "as_of": "2026-08-13",
+    "gasoline_95_usd_per_litre": 0.8988,
+    "diesel_usd_per_litre": 0.9565,
+    "gasoline_95_mmk_per_litre_market": 3820.0,
+    "diesel_mmk_per_litre_market": 4065.0,
+    "as_of": "2026-08-14",
     "stations_sampled": {
       "gasoline_95": 77,
       "diesel": 77
