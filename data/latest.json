@@ -1,18 +1,18 @@
 {
-  "updated_at_utc": "2026-08-14T07:55:04+00:00",
-  "updated_at_yangon": "2026-08-14T14:25:06+06:30",
+  "updated_at_utc": "2026-08-14T13:49:32+00:00",
+  "updated_at_yangon": "2026-08-14T20:19:35+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
       "USD_THB": 36.5,
       "THB_MMK": 116.4384,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-08-14T07:55:04+00:00"
+      "collected_at_utc": "2026-08-14T13:49:32+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
-      "THB_MMK": 63.4,
-      "as_of": "2026-08-13T08:00:00+00:00",
+      "THB_MMK": 63.31,
+      "as_of": "2026-08-14T08:00:00+00:00",
       "source": "Central Bank of Myanmar (official fixed rate)"
     },
     "interbank": {
