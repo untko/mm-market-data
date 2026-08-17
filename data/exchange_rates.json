@@ -1,22 +1,22 @@
 {
-  "updated_at_utc": "2026-08-17T13:11:33+00:00",
+  "updated_at_utc": "2026-08-17T19:03:21+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
     "THB_MMK": 116.4384,
     "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-    "collected_at_utc": "2026-08-17T13:11:33+00:00"
+    "collected_at_utc": "2026-08-17T19:03:21+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
-    "THB_MMK": 63.31,
-    "as_of": "2026-08-14T08:00:00+00:00",
+    "THB_MMK": 63.7,
+    "as_of": "2026-08-17T08:00:00+00:00",
     "source": "Central Bank of Myanmar (official fixed rate)"
   },
   "interbank": {
-    "USD_THB": 33.125,
-    "USD_EUR": 0.86453,
-    "as_of": "2026-08-14",
+    "USD_THB": 33.025,
+    "USD_EUR": 0.86259,
+    "as_of": "2026-08-17",
     "source": "Frankfurter / ECB reference"
   },
   "market_vs_official_spread_pct": 102.38,
@@ -63,7 +63,5 @@
     "source": "SuperRich Thailand retail cash exchange",
     "collected_at_utc": "2026-08-17T02:42:08+00:00"
   },
-  "errors": [
-    "interbank: HTTPSConnectionPool(host='api.frankfurter.dev', port=443): Read timed out. (read timeout=25)"
-  ]
+  "errors": []
 }
