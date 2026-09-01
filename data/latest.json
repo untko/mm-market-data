@@ -1,13 +1,13 @@
 {
-  "updated_at_utc": "2026-09-01T06:36:40+00:00",
-  "updated_at_yangon": "2026-09-01T13:06:57+06:30",
+  "updated_at_utc": "2026-09-01T11:48:50+00:00",
+  "updated_at_yangon": "2026-09-01T18:18:53+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
       "USD_THB": 36.5,
       "THB_MMK": 116.4384,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-09-01T05:21:07+00:00"
+      "collected_at_utc": "2026-09-01T11:48:50+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
@@ -87,7 +87,5 @@
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
-  "errors": [
-    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
-  ]
+  "errors": []
 }
