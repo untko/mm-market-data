@@ -1,11 +1,11 @@
 {
-  "updated_at_utc": "2026-09-03T04:43:06+00:00",
+  "updated_at_utc": "2026-09-03T11:26:25+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
     "THB_MMK": 116.4384,
     "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-    "collected_at_utc": "2026-09-03T04:43:06+00:00"
+    "collected_at_utc": "2026-09-03T11:26:25+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
@@ -63,7 +63,5 @@
     "source": "SuperRich Thailand retail cash exchange",
     "collected_at_utc": "2026-08-27T11:50:35+00:00"
   },
-  "errors": [
-    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
-  ]
+  "errors": []
 }
