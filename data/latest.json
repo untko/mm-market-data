@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-09-05T15:21:02+00:00",
-  "updated_at_yangon": "2026-09-05T21:51:05+06:30",
+  "updated_at_utc": "2026-09-05T20:29:26+00:00",
+  "updated_at_yangon": "2026-09-06T02:59:28+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -87,5 +87,8 @@
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
-  "errors": []
+  "errors": [
+    "_market_from_superrich: 404 Client Error: Not Found for url: https://superrich.tech/api/p2p-rates",
+    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+  ]
 }
