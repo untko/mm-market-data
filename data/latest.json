@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-09-05T20:29:26+00:00",
-  "updated_at_yangon": "2026-09-06T02:59:28+06:30",
+  "updated_at_utc": "2026-09-06T04:50:01+00:00",
+  "updated_at_yangon": "2026-09-06T11:20:22+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -89,6 +89,7 @@
   },
   "errors": [
     "_market_from_superrich: 404 Client Error: Not Found for url: https://superrich.tech/api/p2p-rates",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)",
+    "official_cbm: 522 Server Error: <none> for url: https://forex.cbm.gov.mm/api/latest"
   ]
 }
