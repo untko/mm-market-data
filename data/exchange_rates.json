@@ -64,7 +64,6 @@
     "collected_at_utc": "2026-08-27T11:50:35+00:00"
   },
   "errors": [
-    "_market_from_superrich: 404 Client Error: Not Found for url: https://superrich.tech/api/p2p-rates",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
   ]
 }
