@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-09-24T11:58:55+00:00",
-  "updated_at_yangon": "2026-09-24T18:28:57+06:30",
+  "updated_at_utc": "2026-09-24T17:21:02+00:00",
+  "updated_at_yangon": "2026-09-24T23:51:05+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4250.0,
@@ -11,14 +11,14 @@
     },
     "official_reference": {
       "USD_MMK": 2100.0,
-      "THB_MMK": 63.18,
-      "as_of": "2026-09-23T08:00:00+00:00",
+      "THB_MMK": 62.86,
+      "as_of": "2026-09-24T08:00:00+00:00",
       "source": "Central Bank of Myanmar (official fixed rate)"
     },
     "interbank": {
-      "USD_THB": 33.29,
-      "USD_EUR": 0.87635,
-      "as_of": "2026-09-23",
+      "USD_THB": 33.48,
+      "USD_EUR": 0.87974,
+      "as_of": "2026-09-24",
       "source": "Frankfurter / ECB reference"
     },
     "market_vs_official_spread_pct": 102.38,
