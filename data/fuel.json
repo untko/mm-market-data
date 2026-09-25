@@ -1,10 +1,10 @@
 {
-  "updated_at_utc": "2026-09-24T06:32:18+00:00",
-  "gasoline_95_usd_per_litre": 0.94,
-  "diesel_usd_per_litre": 0.9871,
-  "gasoline_95_mmk_per_litre_market": 3995.0,
-  "diesel_mmk_per_litre_market": 4195.0,
-  "as_of": "2026-09-24",
+  "updated_at_utc": "2026-09-25T06:26:27+00:00",
+  "gasoline_95_usd_per_litre": 1.0929,
+  "diesel_usd_per_litre": 1.1376,
+  "gasoline_95_mmk_per_litre_market": 4645.0,
+  "diesel_mmk_per_litre_market": 4835.0,
+  "as_of": "2026-09-25",
   "stations_sampled": {
     "gasoline_95": 77,
     "diesel": 77
