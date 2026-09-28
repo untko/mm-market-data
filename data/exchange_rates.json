@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-09-28T14:11:43+00:00",
+  "updated_at_utc": "2026-09-28T23:23:01+00:00",
   "market": {
     "USD_MMK": 4250.0,
     "USD_THB": 36.5,
@@ -64,7 +64,7 @@
     "collected_at_utc": "2026-08-27T11:50:35+00:00"
   },
   "errors": [
-    "_market_from_superrich: HTTPSConnectionPool(host='superrich.tech', port=443): Max retries exceeded with url: /api/p2p-rates (Caused by NewConnectionError(\"HTTPSConnection(host='superrich.tech', port=443): Failed to establish a new connection: [Errno 101] Network is unreachable\"))",
+    "_market_from_superrich: HTTPSConnectionPool(host='superrich.tech', port=443): Max retries exceeded with url: /api/p2p-rates (Caused by NameResolutionError(\"HTTPSConnection(host='superrich.tech', port=443): Failed to resolve 'superrich.tech' ([Errno -5] No address associated with hostname)\"))",
     "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
   ]
 }
