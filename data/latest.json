@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-09-29T05:52:58+00:00",
-  "updated_at_yangon": "2026-09-29T12:22:59+06:30",
+  "updated_at_utc": "2026-09-29T07:19:13+00:00",
+  "updated_at_yangon": "2026-09-29T13:49:30+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4595.0,
@@ -76,16 +76,18 @@
     "mmk_per_tical_market": 8924540.02
   },
   "fuel": {
-    "gasoline_95_usd_per_litre": 1.0929,
-    "diesel_usd_per_litre": 1.1376,
+    "gasoline_95_usd_per_litre": 1.0109,
+    "diesel_usd_per_litre": 1.0522,
     "gasoline_95_mmk_per_litre_market": 4645.0,
     "diesel_mmk_per_litre_market": 4835.0,
-    "as_of": "2026-09-28",
+    "as_of": "2026-09-29",
     "stations_sampled": {
       "gasoline_95": 77,
       "diesel": 77
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
-  "errors": []
+  "errors": [
+    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
+  ]
 }
