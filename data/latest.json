@@ -1,13 +1,13 @@
 {
-  "updated_at_utc": "2026-09-28T23:23:01+00:00",
-  "updated_at_yangon": "2026-09-29T05:53:02+06:30",
+  "updated_at_utc": "2026-09-29T05:52:58+00:00",
+  "updated_at_yangon": "2026-09-29T12:22:59+06:30",
   "fx": {
     "market": {
-      "USD_MMK": 4250.0,
-      "USD_THB": 36.5,
-      "THB_MMK": 116.4384,
+      "USD_MMK": 4595.0,
+      "USD_THB": 36.3,
+      "THB_MMK": 126.584,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-09-05T15:21:02+00:00"
+      "collected_at_utc": "2026-09-29T05:52:58+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
@@ -21,7 +21,7 @@
       "as_of": "2026-09-28",
       "source": "Frankfurter / ECB reference"
     },
-    "market_vs_official_spread_pct": 102.38,
+    "market_vs_official_spread_pct": 118.81,
     "retail_cash": {
       "quote_currency": "THB",
       "quotes": {
@@ -87,8 +87,5 @@
     },
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
-  "errors": [
-    "_market_from_superrich: HTTPSConnectionPool(host='superrich.tech', port=443): Max retries exceeded with url: /api/p2p-rates (Caused by NameResolutionError(\"HTTPSConnection(host='superrich.tech', port=443): Failed to resolve 'superrich.tech' ([Errno -5] No address associated with hostname)\"))",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
-  ]
+  "errors": []
 }
