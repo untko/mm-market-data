@@ -63,5 +63,7 @@
     "source": "SuperRich Thailand retail cash exchange",
     "collected_at_utc": "2026-08-27T11:50:35+00:00"
   },
-  "errors": []
+  "errors": [
+    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
+  ]
 }
