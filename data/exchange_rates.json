@@ -1,11 +1,11 @@
 {
-  "updated_at_utc": "2026-10-03T11:49:49+00:00",
+  "updated_at_utc": "2026-10-03T16:31:32+00:00",
   "market": {
     "USD_MMK": 4595.0,
     "USD_THB": 36.3,
     "THB_MMK": 126.584,
     "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-    "collected_at_utc": "2026-10-03T11:49:49+00:00"
+    "collected_at_utc": "2026-10-03T16:31:32+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
