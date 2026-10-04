@@ -1,13 +1,13 @@
 {
-  "updated_at_utc": "2026-10-04T12:33:35+00:00",
-  "updated_at_yangon": "2026-10-04T19:03:42+06:30",
+  "updated_at_utc": "2026-10-04T21:39:47+00:00",
+  "updated_at_yangon": "2026-10-05T04:09:49+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4595.0,
       "USD_THB": 36.3,
       "THB_MMK": 126.584,
       "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-      "collected_at_utc": "2026-10-04T12:33:35+00:00"
+      "collected_at_utc": "2026-10-04T21:39:47+00:00"
     },
     "official_reference": {
       "USD_MMK": 2100.0,
