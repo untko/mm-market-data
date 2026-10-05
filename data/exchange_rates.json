@@ -1,22 +1,22 @@
 {
-  "updated_at_utc": "2026-10-05T05:55:11+00:00",
+  "updated_at_utc": "2026-10-05T14:59:04+00:00",
   "market": {
     "USD_MMK": 4595.0,
     "USD_THB": 36.3,
     "THB_MMK": 126.584,
     "source": "superrich.tech (aggregated Binance P2P USDT ads)",
-    "collected_at_utc": "2026-10-05T05:55:11+00:00"
+    "collected_at_utc": "2026-10-05T14:59:04+00:00"
   },
   "official_reference": {
     "USD_MMK": 2100.0,
-    "THB_MMK": 62.59,
-    "as_of": "2026-10-02T08:00:00+00:00",
+    "THB_MMK": 62.37,
+    "as_of": "2026-10-05T08:00:00+00:00",
     "source": "Central Bank of Myanmar (official fixed rate)"
   },
   "interbank": {
-    "USD_THB": 33.595,
-    "USD_EUR": 0.89087,
-    "as_of": "2026-10-02",
+    "USD_THB": 33.695,
+    "USD_EUR": 0.89254,
+    "as_of": "2026-10-05",
     "source": "Frankfurter / ECB reference"
   },
   "market_vs_official_spread_pct": 118.81,
@@ -63,7 +63,5 @@
     "source": "SuperRich Thailand retail cash exchange",
     "collected_at_utc": "2026-08-27T11:50:35+00:00"
   },
-  "errors": [
-    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
-  ]
+  "errors": []
 }
