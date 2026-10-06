@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-10-06T07:55:49+00:00",
-  "updated_at_yangon": "2026-10-06T14:26:06+06:30",
+  "updated_at_utc": "2026-10-06T18:29:12+00:00",
+  "updated_at_yangon": "2026-10-07T00:59:40+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4595.0,
@@ -11,8 +11,8 @@
     },
     "official_reference": {
       "USD_MMK": 2100.0,
-      "THB_MMK": 62.37,
-      "as_of": "2026-10-05T08:00:00+00:00",
+      "THB_MMK": 62.46,
+      "as_of": "2026-10-06T08:00:00+00:00",
       "source": "Central Bank of Myanmar (official fixed rate)"
     },
     "interbank": {
@@ -88,6 +88,8 @@
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
   "errors": [
-    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
+    "_market_from_superrich: 404 Client Error: Not Found for url: https://www.superrich.tech/api/p2p-rates",
+    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)",
+    "interbank: HTTPSConnectionPool(host='api.frankfurter.dev', port=443): Read timed out. (read timeout=25)"
   ]
 }
