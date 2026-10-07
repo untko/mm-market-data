@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-10-06T18:29:12+00:00",
+  "updated_at_utc": "2026-10-07T06:11:31+00:00",
   "market": {
     "USD_MMK": 4595.0,
     "USD_THB": 36.3,
@@ -14,9 +14,9 @@
     "source": "Central Bank of Myanmar (official fixed rate)"
   },
   "interbank": {
-    "USD_THB": 33.695,
-    "USD_EUR": 0.89254,
-    "as_of": "2026-10-05",
+    "USD_THB": 33.575,
+    "USD_EUR": 0.88739,
+    "as_of": "2026-10-06",
     "source": "Frankfurter / ECB reference"
   },
   "market_vs_official_spread_pct": 118.81,
@@ -65,7 +65,6 @@
   },
   "errors": [
     "_market_from_superrich: 404 Client Error: Not Found for url: https://www.superrich.tech/api/p2p-rates",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)",
-    "interbank: HTTPSConnectionPool(host='api.frankfurter.dev', port=443): Read timed out. (read timeout=25)"
+    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
   ]
 }
