@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-10-10T21:52:30+00:00",
-  "updated_at_yangon": "2026-10-11T04:22:32+06:30",
+  "updated_at_utc": "2026-10-11T06:00:53+00:00",
+  "updated_at_yangon": "2026-10-11T12:31:21+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4595.0,
@@ -89,6 +89,7 @@
   },
   "errors": [
     "_market_from_superrich: 404 Client Error: Not Found for url: https://www.superrich.tech/api/p2p-rates",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)",
+    "interbank: HTTPSConnectionPool(host='api.frankfurter.dev', port=443): Read timed out. (read timeout=25)"
   ]
 }
