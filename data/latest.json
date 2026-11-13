@@ -1,6 +1,6 @@
 {
-  "updated_at_utc": "2026-11-13T06:57:30+00:00",
-  "updated_at_yangon": "2026-11-13T13:27:33+06:30",
+  "updated_at_utc": "2026-11-13T08:32:51+00:00",
+  "updated_at_yangon": "2026-11-13T15:03:40+06:30",
   "fx": {
     "market": {
       "USD_MMK": 4595.0,
@@ -76,11 +76,11 @@
     "mmk_per_tical_market": 8924540.02
   },
   "fuel": {
-    "gasoline_95_usd_per_litre": 1.0,
-    "diesel_usd_per_litre": 1.0011,
-    "gasoline_95_mmk_per_litre_market": 4595.0,
-    "diesel_mmk_per_litre_market": 4600.0,
-    "as_of": "2026-11-12",
+    "gasoline_95_usd_per_litre": 0.9489,
+    "diesel_usd_per_litre": 0.963,
+    "gasoline_95_mmk_per_litre_market": 4360.0,
+    "diesel_mmk_per_litre_market": 4425.0,
+    "as_of": "2026-11-13",
     "stations_sampled": {
       "gasoline_95": 77,
       "diesel": 77
@@ -88,7 +88,6 @@
     "source": "Max Energy Myanmar daily station prices (median across stations)"
   },
   "errors": [
-    "_market_from_superrich: 404 Client Error: Not Found for url: https://www.superrich.tech/api/p2p-rates",
-    "_market_from_binance: binance p2p returned no ads (likely geo-blocked)"
+    "retail_cash_superrich_thailand: 404 Client Error: Not Found for url: https://www.superrichthailand.com/api/v1/rates"
   ]
 }
